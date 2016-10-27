@@ -2,13 +2,23 @@ package com.codepath.apps.twitterapp;
 
 import android.content.Context;
 
+import com.codepath.apps.twitterapp.models.TimelineRequest;
+import com.codepath.apps.twitterapp.models.Tweet;
 import com.codepath.apps.twitterapp.models.User;
 import com.codepath.oauth.OAuthBaseClient;
 import com.loopj.android.http.AsyncHttpResponseHandler;
+import com.loopj.android.http.JsonHttpResponseHandler;
 import com.loopj.android.http.RequestParams;
 
+import org.json.JSONArray;
+import org.json.JSONObject;
 import org.scribe.builder.api.Api;
 import org.scribe.builder.api.TwitterApi;
+
+import java.util.ArrayList;
+
+import cz.msebera.android.httpclient.Header;
+import rx.Observable;
 
 /*
  * 
@@ -55,6 +65,36 @@ public class TwitterClient extends OAuthBaseClient {
 		}
 		getClient().get(apiUrl, params, handler);
 	}
+
+    public Observable<Tweet> getHomeTimeline(TimelineRequest request) {
+        return Observable.create(subscriber -> {
+            getHomeTimeline(
+                    request.getCount(),
+                    request.getSinceId(),
+                    request.getMaxId(),
+                    new JsonHttpResponseHandler() {
+                        @Override
+                        public void onSuccess(int statusCode, Header[] headers, JSONArray response) {
+                            if (!subscriber.isUnsubscribed()) {
+                                ArrayList<Tweet> tweets = Tweet.fromJSONArray(response);
+                                for (Tweet t: tweets) {
+                                    subscriber.onNext(t);
+                                }
+                                subscriber.onCompleted();
+                            }
+                        }
+
+
+                        @Override
+                        public void onFailure(int statusCode, Header[] headers, Throwable throwable, JSONObject errorResponse) {
+                            if (!subscriber.isUnsubscribed()) {
+                                subscriber.onError(throwable);
+                            }
+                        }
+                    }
+            );
+        });
+    }
 
 	public void getMentionsTimeline(int count, long since_id, long max_id, AsyncHttpResponseHandler handler) {
 		String apiUrl = getApiUrl("statuses/mentions_timeline.json");

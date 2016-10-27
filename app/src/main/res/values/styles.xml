@@ -14,6 +14,7 @@
         <item name="actionBarStyle">@style/TwitterActionBar</item>
         <item name="android:actionBarStyle">@style/TwitterActionBar</item>
         <item name="android:windowContentOverlay">@null</item>
+        <item name="android:windowBackground">@color/twitter_lighter_grey</item>
     </style>
 
 
@@ -23,8 +24,10 @@
     </style>
 
     <color name="twitter_blue">#55acee</color>
-    <color name="twitter_mild_grey">#ccd6dd</color>
-    <color name="twitter_grey">#8899a6</color>
-    <color name="twitter_dark_grey">#66757f</color>
-    <color name="twitter_darker_grey">#292f33</color>
+    <color name="twitter_lighter_grey">#fff5f8fa</color>
+    <color name="twitter_light_grey">#ffe1e8ed</color>
+    <color name="twitter_mild_grey">#ffccd6dd</color>
+    <color name="twitter_grey">#ff8899a6</color>
+    <color name="twitter_dark_grey">#ff66757f</color>
+    <color name="twitter_darker_grey">#ff292f33</color>
 </resources>

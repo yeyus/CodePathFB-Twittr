@@ -13,18 +13,12 @@ import com.codepath.apps.twitterapp.TwitterClient;
 import com.codepath.apps.twitterapp.adapters.TweetsAdapter;
 import com.codepath.apps.twitterapp.models.TimelineRequest;
 import com.codepath.apps.twitterapp.models.Tweet;
-import com.loopj.android.http.JsonHttpResponseHandler;
-
-import org.json.JSONArray;
-import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
-import cz.msebera.android.httpclient.Header;
-import rx.Observable;
 import rx.subjects.PublishSubject;
 
 public class TimelineActivity extends AppCompatActivity {
@@ -53,7 +47,7 @@ public class TimelineActivity extends AppCompatActivity {
         // What to do when a request is received
         timelineRequestSubject
                 .distinct()
-                .flatMap(request -> loadTweets(request))
+                .flatMap(request -> client.getHomeTimeline(request))
                 .subscribe(
                         tweet -> {
                             mTimelineTweets.add(tweet);
@@ -87,36 +81,6 @@ public class TimelineActivity extends AppCompatActivity {
 
                 );
             }
-        });
-    }
-
-    private Observable<Tweet> loadTweets(TimelineRequest request) {
-        return Observable.create(subscriber -> {
-            client.getHomeTimeline(
-                    request.getCount(),
-                    request.getSinceId(),
-                    request.getMaxId(),
-                    new JsonHttpResponseHandler() {
-                        @Override
-                        public void onSuccess(int statusCode, Header[] headers, JSONArray response) {
-                            if (!subscriber.isUnsubscribed()) {
-                                ArrayList<Tweet> tweets = Tweet.fromJSONArray(response);
-                                for (Tweet t: tweets) {
-                                    subscriber.onNext(t);
-                                }
-                                subscriber.onCompleted();
-                            }
-                        }
-
-
-                        @Override
-                        public void onFailure(int statusCode, Header[] headers, Throwable throwable, JSONObject errorResponse) {
-                            if (!subscriber.isUnsubscribed()) {
-                                subscriber.onError(throwable);
-                            }
-                        }
-                    }
-            );
         });
     }
 }
