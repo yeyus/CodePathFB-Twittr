@@ -1,0 +1,30 @@
+<resources>
+
+    <style name="AppBaseTheme" parent="Theme.AppCompat.Light.DarkActionBar">
+        <!--
+            Theme customizations available in newer API levels can go in
+            res/values-vXX/styles.xml, while customizations related to
+            backward-compatibility can go here.
+        -->
+    </style>
+
+    <!-- Application theme. -->
+    <style name="AppTheme" parent="AppBaseTheme">
+        <!-- All customizations that are NOT specific to a particular API-level can go here. -->
+        <item name="actionBarStyle">@style/TwitterActionBar</item>
+        <item name="android:actionBarStyle">@style/TwitterActionBar</item>
+        <item name="android:windowContentOverlay">@null</item>
+    </style>
+
+
+    <style name="TwitterActionBar" parent="Widget.AppCompat.Light.ActionBar.Solid.Inverse">
+        <item name="android:background">@color/twitter_blue</item>
+        <item name="background">@color/twitter_blue</item>
+    </style>
+
+    <color name="twitter_blue">#55acee</color>
+    <color name="twitter_mild_grey">#ccd6dd</color>
+    <color name="twitter_grey">#8899a6</color>
+    <color name="twitter_dark_grey">#66757f</color>
+    <color name="twitter_darker_grey">#292f33</color>
+</resources>

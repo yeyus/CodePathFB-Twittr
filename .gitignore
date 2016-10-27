@@ -42,21 +42,3 @@ captures/
 *.jks
 
 .DS_Store
-.gitignore
-.idea/compiler.xml
-.idea/copyright/
-.idea/encodings.xml
-.idea/gradle.xml
-.idea/misc.xml
-.idea/modules.xml
-.idea/runConfigurations.xml
-.idea/vcs.xml
-CodepathFB-Twitter.iml
-LICENSE
-README.md
-app/
-build.gradle
-gradle/
-gradlew
-gradlew.bat
-settings.gradle
