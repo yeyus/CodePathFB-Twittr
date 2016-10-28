@@ -106,6 +106,7 @@ public class TimelineActivity extends AppCompatActivity {
         setSupportProgressBarIndeterminateVisibility(true);
 
         lastRequest = request;
+        // Check for internet connection
         if (!isNetworkAvailable()) {
             Snackbar.make(rootView, R.string.no_internet, Snackbar.LENGTH_INDEFINITE)
                     .setAction(R.string.retry, view -> requestTimeline(lastRequest))
