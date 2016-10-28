@@ -140,11 +140,11 @@ public class Tweet extends BaseModel {
         return tweets;
     }
 
-    public static List<Tweet> getAll() {
+    public static List<Tweet> getLastTweets(int number) {
         return SQLite.select()
                 .from(Tweet.class)
                 .orderBy(Tweet_Table.uid, false)
-                .limit(50)
+                .limit(number)
                 .queryList();
     }
 }

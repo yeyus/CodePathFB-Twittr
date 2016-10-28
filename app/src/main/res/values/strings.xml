@@ -8,5 +8,7 @@
     <string name="send_label">Send</string>
     <string name="tweet_body_hint">What do you think?...</string>
     <string name="tweet_posting_error">Tweet posting failed</string>
+    <string name="no_internet">No internet connection</string>
+    <string name="retry">Retry</string>
 
 </resources>

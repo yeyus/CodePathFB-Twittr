@@ -1,5 +1,8 @@
 package com.codepath.apps.twitterapp.activities;
 
+import android.content.Context;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
@@ -56,12 +59,18 @@ public class TimelineActivity extends AppCompatActivity {
 
         setupRecyclerView();
 
+        // First request
         lastRequest = new TimelineRequest.Builder()
                 .count(25)
                 .sinceId(1)
                 .maxId(-1)
                 .build();
-        requestTimeline(lastRequest);
+        if (!requestTimeline(lastRequest)) {
+            // if offline we populate from db
+            for (Tweet t : Tweet.getLastTweets(50)) {
+                addTweet(t);
+            }
+        }
     }
 
     private void setupRecyclerView() {
@@ -86,11 +95,31 @@ public class TimelineActivity extends AppCompatActivity {
 
     }
 
-    private void requestTimeline(TimelineRequest request) {
+    private Boolean isNetworkAvailable() {
+        ConnectivityManager connectivityManager
+                = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
+        return activeNetworkInfo != null && activeNetworkInfo.isConnectedOrConnecting();
+    }
+
+    private boolean requestTimeline(TimelineRequest request) {
         setSupportProgressBarIndeterminateVisibility(true);
+
+        lastRequest = request;
+        if (!isNetworkAvailable()) {
+            Snackbar.make(rootView, R.string.no_internet, Snackbar.LENGTH_INDEFINITE)
+                    .setAction(R.string.retry, view -> requestTimeline(lastRequest))
+                    .show();
+            return false;
+        }
+
         client.getHomeTimeline(request)
                 .subscribe(
-                        tweet -> addTweet(tweet),
+                        tweet -> {
+                            tweet.getUser().save();
+                            tweet.save();
+                            addTweet(tweet);
+                        },
                         throwable -> Log.e(TAG, "unable to process tweet", throwable),
                         () -> {
                             swipeContainer.setRefreshing(false);
@@ -98,6 +127,8 @@ public class TimelineActivity extends AppCompatActivity {
                             Log.i(TAG, "all tweets were processed");
                         }
                 );
+
+        return true;
     }
 
     private void addTweet(Tweet t) {
