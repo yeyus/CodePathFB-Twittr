@@ -13,6 +13,7 @@ import com.raizlabs.android.dbflow.structure.BaseModel;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.parceler.Parcel;
 
 import java.text.DateFormat;
 import java.text.ParseException;
@@ -23,6 +24,7 @@ import java.util.List;
 import java.util.Locale;
 
 @Table(database = MyDatabase.class)
+@Parcel(analyze={Tweet.class})
 public class Tweet extends BaseModel {
 
     @PrimaryKey

@@ -13,10 +13,12 @@ import com.squareup.picasso.Picasso;
 
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.parceler.Parcel;
 
 import jp.wasabeef.picasso.transformations.RoundedCornersTransformation;
 
 @Table(database = MyDatabase.class)
+@Parcel(analyze={User.class})
 public class User extends BaseModel {
 
     @Column
