@@ -4,11 +4,13 @@ import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.FragmentManager;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.View;
+import android.view.Window;
 
 import com.codepath.apps.twitterapp.EndlessRecyclerViewScrollListener;
 import com.codepath.apps.twitterapp.R;
@@ -25,18 +27,17 @@ import java.util.List;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
-import rx.subjects.PublishSubject;
 
 public class TimelineActivity extends AppCompatActivity {
 
-    public static final String TAG = TweetsAdapter.class.getSimpleName();
+    public static final String TAG = TimelineActivity.class.getSimpleName();
 
     private TwitterClient client;
-    private final PublishSubject<TimelineRequest> timelineRequestSubject = PublishSubject.create();
 
     private View rootView;
 
     @BindView(R.id.rvTweets) RecyclerView rvTweets;
+    @BindView(R.id.swipeContainer) SwipeRefreshLayout swipeContainer;
     @BindView(R.id.fabCompose) FloatingActionButton fabCompose;
 
     private List<Tweet> mTimelineTweets;
@@ -46,6 +47,7 @@ public class TimelineActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        requestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
         rootView = getLayoutInflater().inflate(R.layout.activity_timeline, null);
         setContentView(rootView);
         ButterKnife.bind(this);
@@ -54,25 +56,12 @@ public class TimelineActivity extends AppCompatActivity {
 
         setupRecyclerView();
 
-        // What to do when a request is received
-        timelineRequestSubject
-                .distinct()
-                .flatMap(request -> client.getHomeTimeline(request))
-                .subscribe(
-                        tweet -> {
-                            mTimelineTweets.add(tweet);
-                            tweetsAdapter.notifyItemInserted(mTimelineTweets.size());
-                        },
-                        throwable -> Log.e(TAG, "unable to process tweet", throwable),
-                        () -> Log.i(TAG, "all tweets were processed")
-                );
-
         lastRequest = new TimelineRequest.Builder()
                 .count(25)
                 .sinceId(1)
                 .maxId(-1)
                 .build();
-        timelineRequestSubject.onNext(lastRequest);
+        requestTimeline(lastRequest);
     }
 
     private void setupRecyclerView() {
@@ -84,16 +73,54 @@ public class TimelineActivity extends AppCompatActivity {
         rvTweets.addOnScrollListener(new EndlessRecyclerViewScrollListener(layout) {
             @Override
             public void onLoadMore(int page, int totalItemsCount) {
-                timelineRequestSubject.onNext(
-                        new TimelineRequest.Builder(lastRequest)
-                                .maxId(mTimelineTweets.get(mTimelineTweets.size()-1).getUid())
-                                .build()
-
-                );
+                requestTimeline(new TimelineRequest.Builder(lastRequest)
+                        .maxId(mTimelineTweets.get(mTimelineTweets.size()-1).getUid())
+                        .build());
             }
         });
+
+        swipeContainer.setOnRefreshListener(() -> requestTimeline(new TimelineRequest.Builder(lastRequest)
+                .sinceId(mTimelineTweets.get(0).getUid())
+                .maxId(-1)
+                .build()));
+
     }
 
+    private void requestTimeline(TimelineRequest request) {
+        setSupportProgressBarIndeterminateVisibility(true);
+        client.getHomeTimeline(request)
+                .subscribe(
+                        tweet -> addTweet(tweet),
+                        throwable -> Log.e(TAG, "unable to process tweet", throwable),
+                        () -> {
+                            swipeContainer.setRefreshing(false);
+                            setSupportProgressBarIndeterminateVisibility(false);
+                            Log.i(TAG, "all tweets were processed");
+                        }
+                );
+    }
+
+    private void addTweet(Tweet t) {
+        if (mTimelineTweets.isEmpty()) {
+            appendTweet(t);
+        } else if (t.getUid() > mTimelineTweets.get(0).getUid()) {
+            prependTweet(t);
+        } else if (t.getUid() < mTimelineTweets.get(mTimelineTweets.size() - 1).getUid()) {
+            appendTweet(t);
+        }
+    }
+
+    private void appendTweet(Tweet t) {
+        mTimelineTweets.add(t);
+        tweetsAdapter.notifyItemInserted(mTimelineTweets.size());
+    }
+
+    private void prependTweet(Tweet t) {
+        // Prepend to list and scroll
+        mTimelineTweets.add(0, t);
+        tweetsAdapter.notifyItemInserted(0);
+        rvTweets.scrollToPosition(0);
+    }
 
     @OnClick(R.id.fabCompose)
     public void composeClick() {
@@ -102,12 +129,7 @@ public class TimelineActivity extends AppCompatActivity {
         editNameDialogFragment.getPostSubject()
                 .flatMap(str -> client.postTweet(str))
                 .subscribe(
-                        tweet -> {
-                            // Prepend to list and scroll
-                            mTimelineTweets.add(0, tweet);
-                            tweetsAdapter.notifyItemInserted(0);
-                            rvTweets.scrollToPosition(0);
-                        },
+                        tweet -> addTweet(tweet),
                         throwable -> {
                             Snackbar.make(rootView, R.string.tweet_posting_error, Snackbar.LENGTH_LONG)
                                     .show();
