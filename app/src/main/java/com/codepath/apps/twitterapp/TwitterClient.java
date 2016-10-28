@@ -132,6 +132,28 @@ public class TwitterClient extends OAuthBaseClient {
 		getClient().post(apiUrl, params, handler);
 	}
 
+    public Observable<Tweet> postTweet(String body) {
+        return Observable.create(subscriber -> {
+            postTweet(body, new JsonHttpResponseHandler() {
+                @Override
+                public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
+                    if (!subscriber.isUnsubscribed()) {
+                        subscriber.onNext(Tweet.fromJSON(response));
+                        subscriber.onCompleted();
+                    }
+                }
+
+
+                @Override
+                public void onFailure(int statusCode, Header[] headers, Throwable throwable, JSONObject errorResponse) {
+                    if (!subscriber.isUnsubscribed()) {
+                        subscriber.onError(throwable);
+                    }
+                }
+            });
+        });
+    }
+
 	public void getAccount(AsyncHttpResponseHandler handler) {
 		String apiUrl = getApiUrl("account/verify_credentials.json");
 		getClient().get(apiUrl, null, handler);

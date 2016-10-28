@@ -4,5 +4,9 @@
     <string name="app_name">Twittr</string>
     <string name="login_label">Connect with Twitter</string>
     <string name="tweet_reply_action">Reply</string>
+    <string name="compose_tweet_title">Tweet</string>
+    <string name="send_label">Send</string>
+    <string name="tweet_body_hint">What do you think?...</string>
+    <string name="tweet_posting_error">Tweet posting failed</string>
 
 </resources>

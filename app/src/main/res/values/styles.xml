@@ -11,6 +11,7 @@
     <!-- Application theme. -->
     <style name="AppTheme" parent="AppBaseTheme">
         <!-- All customizations that are NOT specific to a particular API-level can go here. -->
+        <item name="colorAccent">@color/twitter_blue</item>
         <item name="actionBarStyle">@style/TwitterActionBar</item>
         <item name="android:actionBarStyle">@style/TwitterActionBar</item>
         <item name="android:windowContentOverlay">@null</item>
@@ -19,6 +20,14 @@
 
 
     <style name="TwitterActionBar" parent="Widget.AppCompat.Light.ActionBar.Solid.Inverse">
+        <item name="android:background">@color/twitter_blue</item>
+        <item name="background">@color/twitter_blue</item>
+    </style>
+
+    <style name="TwitterToolbar" parent="Widget.AppCompat.Light.ActionBar.Solid.Inverse">
+        <item name="android:textColorPrimary">@color/twitter_lighter_grey</item>
+        <item name="android:textColorSecondary">@color/twitter_light_grey</item>
+        <item name="actionMenuTextColor">@color/twitter_lighter_grey</item>
         <item name="android:background">@color/twitter_blue</item>
         <item name="background">@color/twitter_blue</item>
     </style>
