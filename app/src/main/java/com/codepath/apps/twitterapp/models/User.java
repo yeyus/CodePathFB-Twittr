@@ -3,19 +3,17 @@ package com.codepath.apps.twitterapp.models;
 import android.databinding.BindingAdapter;
 import android.widget.ImageView;
 
+import com.bumptech.glide.Glide;
 import com.codepath.apps.twitterapp.MyDatabase;
 import com.codepath.apps.twitterapp.R;
 import com.raizlabs.android.dbflow.annotation.Column;
 import com.raizlabs.android.dbflow.annotation.PrimaryKey;
 import com.raizlabs.android.dbflow.annotation.Table;
 import com.raizlabs.android.dbflow.structure.BaseModel;
-import com.squareup.picasso.Picasso;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.parceler.Parcel;
-
-import jp.wasabeef.picasso.transformations.RoundedCornersTransformation;
 
 @Table(database = MyDatabase.class)
 @Parcel(analyze={User.class})
@@ -75,11 +73,10 @@ public class User extends BaseModel {
 
     @BindingAdapter({"bind:imageUrl"})
     public static void loadImage(ImageView view, String imageUrl) {
-        Picasso.with(view.getContext())
+        Glide.with(view.getContext())
                 .load(imageUrl)
-                .transform(new RoundedCornersTransformation(3, 3))
                 // TODO find placeholder
-                .placeholder(R.drawable.ic_launcher)
+                .placeholder(R.drawable.egg)
                 .into(view);
     }
 
