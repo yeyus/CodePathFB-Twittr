@@ -20,6 +20,8 @@ import com.codepath.apps.twitterapp.R;
 import com.codepath.apps.twitterapp.TwitterClient;
 import com.codepath.apps.twitterapp.models.Tweet;
 
+import org.parceler.Parcels;
+
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import rx.subjects.PublishSubject;
@@ -45,7 +47,7 @@ public class ComposeTweetDialogFragment extends DialogFragment {
     public static ComposeTweetDialogFragment newInstance(@Nullable Tweet tweet) {
         ComposeTweetDialogFragment f = new ComposeTweetDialogFragment();
         Bundle args = new Bundle();
-        // TODO set instance
+        args.putParcelable("in_reply_to", Parcels.wrap(tweet));
         f.setArguments(args);
         return f;
     }
@@ -73,9 +75,21 @@ public class ComposeTweetDialogFragment extends DialogFragment {
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
+        inReplyTo = Parcels.unwrap(getArguments().getParcelable("in_reply_to"));
+
         // Inflate a menu to be displayed in the toolbar
         toolbar.inflateMenu(R.menu.compose_dialog);
-        toolbar.setTitle(R.string.compose_tweet_title);
+        if (inReplyTo != null) {
+            toolbar.setTitle(R.string.reply_tweet_title);
+            tvInReplyTo.setText(String.format(
+                    getResources().getString(R.string.in_reply_to),
+                    inReplyTo.getUser().getName()));
+            etBody.setText("@" + inReplyTo.getUser().getName() + " ");
+            etBody.setSelection(etBody.getText().length());
+        } else {
+            toolbar.setTitle(R.string.compose_tweet_title);
+        }
+
         txtCharCount = toolbar.getMenu().findItem(R.id.txtCharsLeft);
 
         tvInReplyTo.setVisibility(inReplyTo == null ? View.GONE : View.VISIBLE);

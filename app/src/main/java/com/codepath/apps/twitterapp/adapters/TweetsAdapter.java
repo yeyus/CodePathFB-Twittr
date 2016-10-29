@@ -12,9 +12,9 @@ import com.codepath.apps.twitterapp.models.Tweet;
 
 import java.util.List;
 
-public class TweetsAdapter extends RecyclerView.Adapter<TweetsAdapter.ViewHolder> {
+import rx.subjects.PublishSubject;
 
-    public static final String TAG = TweetsAdapter.class.getSimpleName();
+public class TweetsAdapter extends RecyclerView.Adapter<TweetsAdapter.ViewHolder> {
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
         final ItemTweetBinding binding;
@@ -25,12 +25,24 @@ public class TweetsAdapter extends RecyclerView.Adapter<TweetsAdapter.ViewHolder
         }
     }
 
+    public static final String TAG = TweetsAdapter.class.getSimpleName();
+    private final PublishSubject<Tweet> replyClickSubject = PublishSubject.create();
+    private final PublishSubject<Tweet> tweetClickSubject = PublishSubject.create();
+
     private List<Tweet> mTweets;
     private Context mContext;
 
     public TweetsAdapter(Context context, List<Tweet> tweets) {
         mTweets = tweets;
         mContext = context;
+    }
+
+    public PublishSubject<Tweet> getReplyClickSubject() {
+        return replyClickSubject;
+    }
+
+    public PublishSubject<Tweet> getTweetClickSubject() {
+        return tweetClickSubject;
     }
 
     @Override
@@ -50,6 +62,10 @@ public class TweetsAdapter extends RecyclerView.Adapter<TweetsAdapter.ViewHolder
 
         holder.binding.setTweet(tweet);
         holder.binding.executePendingBindings();
+        holder.binding.btnReply.setOnClickListener(view -> {
+            replyClickSubject.onNext(tweet);
+        });
+        holder.binding.tvBody.setOnClickListener(view -> tweetClickSubject.onNext(tweet));
     }
 
     @Override

@@ -1,6 +1,7 @@
 package com.codepath.apps.twitterapp.activities;
 
 import android.content.Context;
+import android.content.Intent;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Bundle;
@@ -23,6 +24,8 @@ import com.codepath.apps.twitterapp.adapters.TweetsAdapter;
 import com.codepath.apps.twitterapp.fragments.ComposeTweetDialogFragment;
 import com.codepath.apps.twitterapp.models.TimelineRequest;
 import com.codepath.apps.twitterapp.models.Tweet;
+
+import org.parceler.Parcels;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -58,6 +61,7 @@ public class TimelineActivity extends AppCompatActivity {
         client = TwitterApplication.getRestClient();
 
         setupRecyclerView();
+        setupListeners();
 
         // First request
         lastRequest = new TimelineRequest.Builder()
@@ -79,6 +83,8 @@ public class TimelineActivity extends AppCompatActivity {
         rvTweets.setAdapter(tweetsAdapter);
         LinearLayoutManager layout = new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false);
         rvTweets.setLayoutManager(layout);
+
+        // Infinite scroll
         rvTweets.addOnScrollListener(new EndlessRecyclerViewScrollListener(layout) {
             @Override
             public void onLoadMore(int page, int totalItemsCount) {
@@ -87,12 +93,28 @@ public class TimelineActivity extends AppCompatActivity {
                         .build());
             }
         });
+    }
 
+    private void setupListeners() {
+        // Reply click
+        tweetsAdapter.getReplyClickSubject().subscribe(
+                tweet -> openComposeDialog(tweet)
+        );
+
+        // Open detail click
+        tweetsAdapter.getTweetClickSubject().subscribe(
+                tweet -> {
+                    Intent i = new Intent(TimelineActivity.this, TweetActivity.class);
+                    i.putExtra("tweet", Parcels.wrap(tweet));
+                    startActivity(i);
+                }
+        );
+
+        // Pull to refresh
         swipeContainer.setOnRefreshListener(() -> requestTimeline(new TimelineRequest.Builder(lastRequest)
                 .sinceId(mTimelineTweets.get(0).getUid())
                 .maxId(-1)
                 .build()));
-
     }
 
     private Boolean isNetworkAvailable() {
@@ -154,10 +176,9 @@ public class TimelineActivity extends AppCompatActivity {
         rvTweets.scrollToPosition(0);
     }
 
-    @OnClick(R.id.fabCompose)
-    public void composeClick() {
+    private void openComposeDialog(Tweet t) {
         FragmentManager fm = getSupportFragmentManager();
-        ComposeTweetDialogFragment editNameDialogFragment = ComposeTweetDialogFragment.newInstance(null);
+        ComposeTweetDialogFragment editNameDialogFragment = ComposeTweetDialogFragment.newInstance(t);
         editNameDialogFragment.getPostSubject()
                 .flatMap(str -> client.postTweet(str))
                 .subscribe(
@@ -173,5 +194,10 @@ public class TimelineActivity extends AppCompatActivity {
                         }
                 );
         editNameDialogFragment.show(fm, "fragment_compose_tweet");
+    }
+
+    @OnClick(R.id.fabCompose)
+    public void composeClick() {
+        openComposeDialog(null);
     }
 }
