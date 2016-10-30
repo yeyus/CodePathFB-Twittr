@@ -7,12 +7,12 @@ import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
 
+import com.bumptech.glide.Glide;
 import com.codepath.apps.twitterapp.R;
 import com.codepath.apps.twitterapp.fragments.TweetFragment;
 import com.codepath.apps.twitterapp.models.Tweet;
 import com.liuguangqiang.swipeback.SwipeBackActivity;
 import com.liuguangqiang.swipeback.SwipeBackLayout;
-import com.squareup.picasso.Picasso;
 
 import org.parceler.Parcels;
 
@@ -41,7 +41,7 @@ public class ImageActivity extends SwipeBackActivity {
         ft.replace(R.id.fragmentTweet, fragmentTweet);
         ft.commit();
 
-        Picasso.with(this)
+        Glide.with(this)
                 .load(tweet.getAnyMedia())
                 .into(ivMedia);
 

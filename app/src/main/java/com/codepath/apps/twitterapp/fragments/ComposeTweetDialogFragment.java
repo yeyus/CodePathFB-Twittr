@@ -92,6 +92,15 @@ public class ComposeTweetDialogFragment extends DialogFragment {
     }
 
     @Override
+    public void onResume() {
+        super.onResume();
+
+        getDialog().getWindow().setLayout(
+                getResources().getDisplayMetrics().widthPixels,
+                getResources().getDisplayMetrics().heightPixels / 2);
+    }
+
+    @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
@@ -99,6 +108,7 @@ public class ComposeTweetDialogFragment extends DialogFragment {
         String body = getArguments().getString("body");
 
         // Inflate a menu to be displayed in the toolbar
+        toolbar.setNavigationIcon(getResources().getDrawable(R.drawable.ic_close_24dp));
         toolbar.inflateMenu(R.menu.compose_dialog);
         if (inReplyTo != null) {
             toolbar.setTitle(R.string.reply_tweet_title);
@@ -132,6 +142,10 @@ public class ComposeTweetDialogFragment extends DialogFragment {
             return true;
         });
 
+        toolbar.setNavigationOnClickListener(v -> {
+            getDialog().dismiss();
+        });
+
         etBody.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {}
@@ -151,7 +165,14 @@ public class ComposeTweetDialogFragment extends DialogFragment {
 
     @Override
     public void onDetach() {
-        if (!mTweetSent) {
+        saveOnDismiss();
+
+        postSubject.onCompleted();
+        super.onDetach();
+    }
+
+    private void saveOnDismiss() {
+        if (!mTweetSent && etBody.getText().length() > 0) {
             SharedPreferences.Editor edit = pref.edit();
             new AlertDialog.Builder(getContext())
                     .setTitle(R.string.dialog_save)
@@ -165,9 +186,6 @@ public class ComposeTweetDialogFragment extends DialogFragment {
                         edit.commit();
                     }).show();
         }
-
-        postSubject.onCompleted();
-        super.onDetach();
     }
 
     private void sendTweet() {

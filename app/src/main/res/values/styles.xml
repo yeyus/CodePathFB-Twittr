@@ -6,10 +6,11 @@
             res/values-vXX/styles.xml, while customizations related to
             backward-compatibility can go here.
         -->
+        <item name="colorAccent">@color/twitter_blue</item>
     </style>
 
     <!-- Application theme. -->
-    <style name="AppTheme" parent="AppBaseTheme">
+    <style name="AppTheme" parent="Theme.AppCompat.Light.NoActionBar">
         <!-- All customizations that are NOT specific to a particular API-level can go here. -->
         <item name="colorAccent">@color/twitter_blue</item>
         <item name="actionBarStyle">@style/TwitterActionBar</item>
@@ -17,6 +18,16 @@
         <item name="android:windowContentOverlay">@null</item>
         <item name="android:windowBackground">@color/twitter_lighter_grey</item>
     </style>
+
+    <style name="AppThemeActionBar" parent="Theme.AppCompat.Light.DarkActionBar">
+        <!-- All customizations that are NOT specific to a particular API-level can go here. -->
+        <item name="colorAccent">@color/twitter_blue</item>
+        <item name="actionBarStyle">@style/TwitterActionBar</item>
+        <item name="android:actionBarStyle">@style/TwitterActionBar</item>
+        <item name="android:windowContentOverlay">@null</item>
+        <item name="android:windowBackground">@color/twitter_lighter_grey</item>
+    </style>
+
 
     <style name="Theme.Swipe.Back" parent="Theme.AppCompat.Light.NoActionBar">
         <item name="android:windowIsTranslucent">true</item>
@@ -36,6 +47,7 @@
         <item name="actionMenuTextColor">@color/twitter_lighter_grey</item>
         <item name="android:background">@color/twitter_blue</item>
         <item name="background">@color/twitter_blue</item>
+        <item name="colorControlNormal">@color/twitter_light_grey</item>
     </style>
 
     <color name="twitter_blue">#55acee</color>

@@ -15,6 +15,8 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.parceler.Parcel;
 
+import jp.wasabeef.glide.transformations.RoundedCornersTransformation;
+
 @Table(database = MyDatabase.class)
 @Parcel(analyze={User.class})
 public class User extends BaseModel {
@@ -75,6 +77,7 @@ public class User extends BaseModel {
     public static void loadImage(ImageView view, String imageUrl) {
         Glide.with(view.getContext())
                 .load(imageUrl)
+                .bitmapTransform(new RoundedCornersTransformation(view.getContext(), 5, 5))
                 // TODO find placeholder
                 .placeholder(R.drawable.egg)
                 .into(view);

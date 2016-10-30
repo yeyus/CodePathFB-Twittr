@@ -76,7 +76,7 @@
             android:scaleType="centerCrop"
             android:layout_marginBottom="@dimen/tweet_elm_guard"/>
 
-        <LinearLayout
+        <RelativeLayout
             android:orientation="horizontal"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
@@ -94,8 +94,11 @@
                 tools:text="@string/tweet_reply_action"
                 android:id="@+id/btnReply"
                 android:background="@android:color/transparent"
+                android:tint="@color/twitter_grey"
                 android:scaleType="fitXY"
-                android:layout_marginRight="40dp" />
+                android:layout_centerHorizontal="true"
+                android:layout_alignParentStart="true"
+                android:layout_alignParentLeft="true"/>
 
             <ImageButton
                 android:layout_width="25dp"
@@ -104,7 +107,11 @@
                 tools:text="@string/tweet_reply_action"
                 android:id="@+id/btnRetweet"
                 android:background="@android:color/transparent"
-                android:scaleType="fitXY" />
+                android:tint="@color/twitter_grey"
+                android:scaleType="fitXY"
+                android:layout_centerHorizontal="true"
+                android:layout_toLeftOf="@+id/tvRetweetsCount"
+                />
 
             <TextView
                 android:layout_width="wrap_content"
@@ -112,7 +119,8 @@
                 tools:text="154"
                 android:text='@{String.valueOf(tweet.retweetCount)}'
                 android:id="@+id/tvRetweetsCount"
-                android:layout_marginRight="40dp" />
+                android:layout_centerHorizontal="true"
+                android:layout_centerVertical="true" />
 
             <ImageButton
                 android:layout_width="25dp"
@@ -121,8 +129,11 @@
                 tools:text="@string/tweet_reply_action"
                 android:id="@+id/imageButton"
                 android:background="@android:color/transparent"
+                android:tint="@color/twitter_grey"
                 android:scaleType="fitXY"
-                android:layout_gravity="center_vertical" />
+                android:layout_gravity="center_vertical"
+                android:layout_centerHorizontal="true"
+                android:layout_toLeftOf="@+id/tvFavCount"/>
 
             <TextView
                 android:layout_width="wrap_content"
@@ -130,9 +141,11 @@
                 tools:text="1356"
                 android:text='@{String.valueOf(tweet.favouritesCount)}'
                 android:id="@+id/tvFavCount"
-                android:layout_gravity="center_vertical" />
+                android:layout_centerHorizontal="true"
+                android:layout_alignParentRight="true"
+                android:layout_alignParentEnd="true" />
 
-        </LinearLayout>
+        </RelativeLayout>
 
         <TextView
             android:layout_width="wrap_content"
@@ -141,10 +154,15 @@
             tools:text="\@user"
             android:text='@{tweet.user.screenName}'
             android:id="@+id/tvHandle"
+            android:maxLines="1"
+            android:ellipsize="end"
             android:layout_alignBottom="@+id/tvUsername"
             android:layout_toRightOf="@+id/tvUsername"
             android:layout_toEndOf="@+id/tvUsername"
+            android:layout_toLeftOf="@+id/tvRelativeTime"
+            android:layout_toStartOf="@+id/tvRelativeTime"
             android:layout_marginLeft="10dp"
+            android:layout_marginRight="10dp"
             android:textColor="@android:color/primary_text_light" />
     </RelativeLayout>
 </layout>

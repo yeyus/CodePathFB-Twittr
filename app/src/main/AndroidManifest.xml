@@ -42,15 +42,15 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".activities.TimelineActivity"
-            android:theme="@style/Theme.AppCompat.Light.NoActionBar">
+            android:name=".activities.TimelineActivity">
             <intent-filter>
                 <action android:name="android.intent.action.SEND"/>
                 <category android:name="android.intent.category.DEFAULT"/>
                 <data android:mimeType="text/plain"></data>
             </intent-filter>
         </activity>
-        <activity android:name=".activities.TweetActivity" />
+        <activity android:name=".activities.TweetActivity"
+            android:theme="@style/AppThemeActionBar"/>
         <activity
             android:name=".activities.ImageActivity"
             android:theme="@style/Theme.AppCompat.NoActionBar">

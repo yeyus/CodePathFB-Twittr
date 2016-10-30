@@ -53,7 +53,8 @@ dependencies {
     compile 'io.reactivex:rxandroid:1.2.1'
     compile 'com.jakewharton:butterknife:8.2.1'
     compile 'com.github.bumptech.glide:glide:3.5.2'
-    compile 'jp.wasabeef:picasso-transformations:2.1.0'
+    compile 'jp.wasabeef:glide-transformations:2.0.1'
+    // If you want to use the GPU Filters
     compile 'jp.co.cyberagent.android.gpuimage:gpuimage-library:1.4.1'
     compile 'com.github.liuguangqiang.swipeback:library:1.0.2@aar'
     // Android Async Http for sending async network requests

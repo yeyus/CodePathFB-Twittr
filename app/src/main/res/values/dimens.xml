@@ -7,5 +7,6 @@
     <dimen name="label_margin">6dp</dimen>
     <dimen name="tweet_media_max_height">150dp</dimen>
     <dimen name="tweet_elm_guard">10dp</dimen>
+    <dimen name="toolbar_elevation">2dp</dimen>
 
 </resources>

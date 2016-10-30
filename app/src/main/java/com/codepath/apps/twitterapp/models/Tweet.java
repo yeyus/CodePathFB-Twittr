@@ -24,6 +24,8 @@ import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
+import static android.text.format.DateUtils.FORMAT_ABBREV_RELATIVE;
+
 @Table(database = MyDatabase.class)
 @Parcel(analyze={Tweet.class})
 public class Tweet extends BaseModel {
@@ -85,7 +87,7 @@ public class Tweet extends BaseModel {
         try {
             long dateMillis = sf.parse(createdAt).getTime();
             relativeDate = DateUtils.getRelativeTimeSpanString(dateMillis,
-                    System.currentTimeMillis(), DateUtils.SECOND_IN_MILLIS).toString();
+                    System.currentTimeMillis(), DateUtils.SECOND_IN_MILLIS, FORMAT_ABBREV_RELATIVE).toString();
         } catch (ParseException e) {
             e.printStackTrace();
         }
