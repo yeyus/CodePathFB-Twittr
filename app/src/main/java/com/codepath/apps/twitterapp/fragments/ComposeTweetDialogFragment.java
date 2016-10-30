@@ -1,10 +1,13 @@
 package com.codepath.apps.twitterapp.fragments;
 
 import android.app.Dialog;
+import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.DialogFragment;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.Toolbar;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -35,6 +38,8 @@ public class ComposeTweetDialogFragment extends DialogFragment {
     MenuItem txtCharCount;
 
     private final PublishSubject<String> postSubject = PublishSubject.create();
+    SharedPreferences pref;
+    private boolean mTweetSent = false;
 
     public ComposeTweetDialogFragment() {}
 
@@ -43,7 +48,11 @@ public class ComposeTweetDialogFragment extends DialogFragment {
     }
 
     public static ComposeTweetDialogFragment newInstance() {
-        return new ComposeTweetDialogFragment();
+        ComposeTweetDialogFragment f = new ComposeTweetDialogFragment();
+        Bundle args = new Bundle();
+        args.putParcelable("in_reply_to", null);
+        f.setArguments(args);
+        return f;
     }
 
     public static ComposeTweetDialogFragment newInstance(@Nullable Tweet tweet) {
@@ -66,6 +75,7 @@ public class ComposeTweetDialogFragment extends DialogFragment {
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
         Dialog dialog = super.onCreateDialog(savedInstanceState);
+        pref = PreferenceManager.getDefaultSharedPreferences(getContext());
 
         // request a window without the title
         dialog.getWindow().requestFeature(Window.FEATURE_NO_TITLE);
@@ -106,7 +116,7 @@ public class ComposeTweetDialogFragment extends DialogFragment {
         }
 
         txtCharCount = toolbar.getMenu().findItem(R.id.txtCharsLeft);
-
+        etBody.setText(pref.getString("lastTweet", ""));
         tvInReplyTo.setVisibility(inReplyTo == null ? View.GONE : View.VISIBLE);
 
         setupListeners();
@@ -141,11 +151,27 @@ public class ComposeTweetDialogFragment extends DialogFragment {
 
     @Override
     public void onDetach() {
+        if (!mTweetSent) {
+            SharedPreferences.Editor edit = pref.edit();
+            new AlertDialog.Builder(getContext())
+                    .setTitle(R.string.dialog_save)
+                    .setMessage(R.string.dialog_save_as_draft)
+                    .setPositiveButton(R.string.dialog_save, (dialogInterface, i) -> {
+                        edit.putString("lastTweet", etBody.getText().toString());
+                        edit.commit();
+                    })
+                    .setNegativeButton(R.string.dialog_dismiss, (dialogInterface, i) -> {
+                        edit.remove("lastTweet");
+                        edit.commit();
+                    }).show();
+        }
+
         postSubject.onCompleted();
         super.onDetach();
     }
 
     private void sendTweet() {
+        mTweetSent = true;
         postSubject.onNext(etBody.getText().toString());
         postSubject.onCompleted();
     }

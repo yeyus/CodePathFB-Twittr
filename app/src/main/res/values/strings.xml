@@ -12,5 +12,8 @@
     <string name="retry">Retry</string>
     <string name="reply_tweet_title">Reply</string>
     <string name="in_reply_to">In reply to %s</string>
+    <string name="dialog_save">Save</string>
+    <string name="dialog_dismiss">Dismiss</string>
+    <string name="dialog_save_as_draft">Do you want to save as a draft?</string>
 
 </resources>
