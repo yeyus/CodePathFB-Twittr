@@ -26,6 +26,7 @@ import com.codepath.apps.twitterapp.adapters.TweetsAdapter;
 import com.codepath.apps.twitterapp.fragments.ComposeTweetDialogFragment;
 import com.codepath.apps.twitterapp.models.TimelineRequest;
 import com.codepath.apps.twitterapp.models.Tweet;
+import com.codepath.apps.twitterapp.thirdparty.SimpleDividerItemDecoration;
 
 import org.parceler.Parcels;
 
@@ -103,6 +104,7 @@ public class TimelineActivity extends AppCompatActivity {
         rvTweets.setAdapter(tweetsAdapter);
         LinearLayoutManager layout = new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false);
         rvTweets.setLayoutManager(layout);
+        rvTweets.addItemDecoration(new SimpleDividerItemDecoration(this));
 
         // Infinite scroll
         rvTweets.addOnScrollListener(new EndlessRecyclerViewScrollListener(layout) {

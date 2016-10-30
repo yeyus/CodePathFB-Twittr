@@ -13,13 +13,37 @@
         android:descendantFocusability="blocksDescendants"
         tools:context=".activities.TimelineActivity">
 
+        <LinearLayout
+            android:id="@+id/llRetweet"
+            android:visibility='@{tweet.isRetweet ? View.VISIBLE : View.GONE}'
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentTop="true"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true"
+            android:orientation="horizontal"
+            android:layout_marginLeft="60dp"
+            android:layout_marginBottom="@dimen/tweet_elm_guard"
+            android:gravity="center_vertical">
+
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/ic_retweet_24dp"/>
+            
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text='@{tweet.retweetedBy + " retweeted"}' />
+        </LinearLayout>
+
         <ImageView
             android:layout_width="50dp"
             android:layout_height="50dp"
             android:id="@+id/ivProfileImage"
             tools:src="@drawable/ic_launcher"
             app:imageUrl='@{tweet.user.profileImageUrl}'
-            android:layout_alignParentTop="true"
+            android:layout_below="@id/llRetweet"
             android:layout_alignParentLeft="true"
             android:layout_alignParentStart="true"
             android:descendantFocusability="blocksDescendants"
@@ -33,7 +57,7 @@
             tools:text="Username"
             android:text='@{tweet.user.name}'
             android:id="@+id/tvUsername"
-            android:layout_alignParentTop="true"
+            android:layout_below="@id/llRetweet"
             android:layout_toRightOf="@+id/ivProfileImage"
             android:layout_toEndOf="@+id/ivProfileImage" />
 
@@ -57,7 +81,7 @@
             tools:text="1d"
             android:text='@{tweet.relativeCreatedAt}'
             android:id="@+id/tvRelativeTime"
-            android:layout_alignParentTop="true"
+            android:layout_below="@id/llRetweet"
             android:layout_alignParentRight="true"
             android:layout_alignParentEnd="true" />
 

@@ -50,6 +50,13 @@ public class Tweet extends BaseModel {
     @Column
     Integer favouritesCount = 0;
 
+    @Column
+    Boolean isRetweet;
+
+    @Column
+    String retweetedBy;
+
+
     List<MediaEntity> media;
 
     public Tweet() { super(); }
@@ -131,10 +138,27 @@ public class Tweet extends BaseModel {
         return media;
     }
 
+    public Boolean isRetweet() {
+        return isRetweet;
+    }
+
+    public String getRetweetedBy() {
+        return retweetedBy;
+    }
+
     public static Tweet fromJSON(JSONObject jsonObject) {
         Tweet tw = new Tweet();
 
         try {
+            if(!jsonObject.isNull("retweeted_status")) {
+                tw.retweetedBy = User.fromJSON(jsonObject.getJSONObject("user")).getName();
+                jsonObject = jsonObject.getJSONObject("retweeted_status");
+                tw.isRetweet = true;
+            } else {
+                tw.isRetweet = false;
+                tw.retweetedBy = "No one";
+            }
+
             tw.body = jsonObject.getString("text");
             tw.uid = jsonObject.getLong("id");
             tw.createdAt = jsonObject.getString("created_at");
@@ -155,6 +179,7 @@ public class Tweet extends BaseModel {
                     tw.media = media;
                 }
             }
+
         } catch (JSONException e) {
             e.printStackTrace();
         }
