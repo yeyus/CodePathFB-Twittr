@@ -41,7 +41,9 @@
                     android:scheme="oauth" />
             </intent-filter>
         </activity>
-        <activity android:name=".activities.TimelineActivity" />
+        <activity
+            android:name=".activities.TimelineActivity"
+            android:theme="@style/Theme.AppCompat.Light.NoActionBar" />
         <activity android:name=".activities.TweetActivity" />
         <activity
             android:name=".activities.ImageActivity"
