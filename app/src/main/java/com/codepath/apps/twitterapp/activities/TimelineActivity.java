@@ -57,17 +57,31 @@ public class TimelineActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        Intent intent = getIntent();
+        String action = intent.getAction();
+        String type = intent.getType();
+
         requestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
         rootView = getLayoutInflater().inflate(R.layout.activity_timeline, null);
         setContentView(rootView);
         ButterKnife.bind(this);
-
         setSupportActionBar(toolbar);
 
         client = TwitterApplication.getRestClient();
 
         setupRecyclerView();
         setupListeners();
+
+        if (Intent.ACTION_SEND.equals(action) && type != null) {
+            if ("text/plain".equals(type)) {
+
+                // Make sure to check whether returned data will be null.
+                String titleOfPage = intent.getStringExtra(Intent.EXTRA_SUBJECT);
+                String urlOfPage = intent.getStringExtra(Intent.EXTRA_TEXT);
+                composeFromIntent(titleOfPage, urlOfPage);
+            }
+        }
 
         // First request
         lastRequest = new TimelineRequest.Builder()
@@ -104,7 +118,7 @@ public class TimelineActivity extends AppCompatActivity {
     private void setupListeners() {
         // Reply click
         tweetsAdapter.getReplyClickSubject().subscribe(
-                tweet -> openComposeDialog(tweet)
+                tweet -> openComposeDialog(ComposeTweetDialogFragment.newInstance(tweet))
         );
 
         // Open detail click
@@ -184,10 +198,9 @@ public class TimelineActivity extends AppCompatActivity {
         rvTweets.scrollToPosition(0);
     }
 
-    private void openComposeDialog(Tweet t) {
+    private void openComposeDialog(ComposeTweetDialogFragment fragment) {
         FragmentManager fm = getSupportFragmentManager();
-        ComposeTweetDialogFragment editNameDialogFragment = ComposeTweetDialogFragment.newInstance(t);
-        editNameDialogFragment.getPostSubject()
+        fragment.getPostSubject()
                 .flatMap(str -> client.postTweet(str))
                 .subscribe(
                         tweet -> addTweet(tweet),
@@ -197,15 +210,27 @@ public class TimelineActivity extends AppCompatActivity {
                             Log.e(TAG, "tweet posting error", throwable);
                         },
                         () -> {
-                            editNameDialogFragment.dismiss();
+                            fragment.dismiss();
                             Log.i(TAG, "tweet posting dismissed");
                         }
                 );
-        editNameDialogFragment.show(fm, "fragment_compose_tweet");
+        fragment.show(fm, "fragment_compose_tweet");
     }
 
     @OnClick(R.id.fabCompose)
-    public void composeClick() {
-        openComposeDialog(null);
+    public void composeFromClick() {
+        openComposeDialog(ComposeTweetDialogFragment.newInstance());
+    }
+
+    public void composeFromIntent(String title, String text) {
+        StringBuffer body = new StringBuffer();
+        body.append(title);
+        body.append(" - ");
+        body.append(text);
+        openComposeDialog(
+                ComposeTweetDialogFragment.newInstance(
+                    body.substring(0, Math.min(140, body.length()))
+                )
+        );
     }
 }

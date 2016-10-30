@@ -17,7 +17,6 @@ import android.widget.EditText;
 import android.widget.TextView;
 
 import com.codepath.apps.twitterapp.R;
-import com.codepath.apps.twitterapp.TwitterClient;
 import com.codepath.apps.twitterapp.models.Tweet;
 
 import org.parceler.Parcels;
@@ -28,7 +27,6 @@ import rx.subjects.PublishSubject;
 
 public class ComposeTweetDialogFragment extends DialogFragment {
 
-    private TwitterClient client;
     private Tweet inReplyTo;
 
     @BindView(R.id.toolbar) Toolbar toolbar;
@@ -44,10 +42,22 @@ public class ComposeTweetDialogFragment extends DialogFragment {
         return postSubject;
     }
 
+    public static ComposeTweetDialogFragment newInstance() {
+        return new ComposeTweetDialogFragment();
+    }
+
     public static ComposeTweetDialogFragment newInstance(@Nullable Tweet tweet) {
         ComposeTweetDialogFragment f = new ComposeTweetDialogFragment();
         Bundle args = new Bundle();
         args.putParcelable("in_reply_to", Parcels.wrap(tweet));
+        f.setArguments(args);
+        return f;
+    }
+
+    public static ComposeTweetDialogFragment newInstance(String body) {
+        ComposeTweetDialogFragment f = new ComposeTweetDialogFragment();
+        Bundle args = new Bundle();
+        args.putString("body", body);
         f.setArguments(args);
         return f;
     }
@@ -76,6 +86,7 @@ public class ComposeTweetDialogFragment extends DialogFragment {
         super.onViewCreated(view, savedInstanceState);
 
         inReplyTo = Parcels.unwrap(getArguments().getParcelable("in_reply_to"));
+        String body = getArguments().getString("body");
 
         // Inflate a menu to be displayed in the toolbar
         toolbar.inflateMenu(R.menu.compose_dialog);
@@ -88,6 +99,10 @@ public class ComposeTweetDialogFragment extends DialogFragment {
             etBody.setSelection(etBody.getText().length());
         } else {
             toolbar.setTitle(R.string.compose_tweet_title);
+        }
+
+        if (body != null) {
+            etBody.setText(body);
         }
 
         txtCharCount = toolbar.getMenu().findItem(R.id.txtCharsLeft);
