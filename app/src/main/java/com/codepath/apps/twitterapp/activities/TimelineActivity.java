@@ -111,10 +111,13 @@ public class TimelineActivity extends AppCompatActivity {
         );
 
         // Pull to refresh
-        swipeContainer.setOnRefreshListener(() -> requestTimeline(new TimelineRequest.Builder(lastRequest)
-                .sinceId(mTimelineTweets.get(0).getUid())
+        swipeContainer.setOnRefreshListener(() -> {
+            requestTimeline(new TimelineRequest.Builder(lastRequest)
+                .sinceId(mTimelineTweets.isEmpty() ?
+                        1 : mTimelineTweets.get(0).getUid())
                 .maxId(-1)
-                .build()));
+                .build());
+        });
     }
 
     private Boolean isNetworkAvailable() {
@@ -139,8 +142,7 @@ public class TimelineActivity extends AppCompatActivity {
         client.getHomeTimeline(request)
                 .subscribe(
                         tweet -> {
-                            tweet.getUser().save();
-                            tweet.save();
+                            tweet.persist();
                             addTweet(tweet);
                         },
                         throwable -> Log.e(TAG, "unable to process tweet", throwable),

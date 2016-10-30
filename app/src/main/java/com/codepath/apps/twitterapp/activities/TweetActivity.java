@@ -21,8 +21,9 @@ public class TweetActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_tweet);
         tweet = Parcels.unwrap(getIntent().getParcelableExtra("tweet"));
+        boolean showMedia = getIntent().getBooleanExtra("show_media", true);
 
-        fragmentTweet = TweetFragment.newInstance(tweet);
+        fragmentTweet = TweetFragment.newInstance(tweet, showMedia, true);
         FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
         ft.replace(R.id.fragmentTweet, fragmentTweet);
         ft.commit();

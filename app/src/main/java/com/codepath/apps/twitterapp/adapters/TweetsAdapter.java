@@ -1,14 +1,18 @@
 package com.codepath.apps.twitterapp.adapters;
 
 import android.content.Context;
+import android.content.Intent;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
 import com.codepath.apps.twitterapp.R;
+import com.codepath.apps.twitterapp.activities.ImageActivity;
 import com.codepath.apps.twitterapp.databinding.ItemTweetBinding;
 import com.codepath.apps.twitterapp.models.Tweet;
+
+import org.parceler.Parcels;
 
 import java.util.List;
 
@@ -66,6 +70,12 @@ public class TweetsAdapter extends RecyclerView.Adapter<TweetsAdapter.ViewHolder
             replyClickSubject.onNext(tweet);
         });
         holder.binding.tvBody.setOnClickListener(view -> tweetClickSubject.onNext(tweet));
+        holder.binding.ivMedia.setOnClickListener(view -> {
+            Intent i = new Intent(mContext, ImageActivity.class);
+            i.putExtra("tweet", Parcels.wrap(tweet));
+            i.putExtra("show_media", false);
+            mContext.startActivity(i);
+        });
     }
 
     @Override

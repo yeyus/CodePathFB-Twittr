@@ -19,6 +19,8 @@ import rx.subjects.PublishSubject;
 public class TweetFragment extends Fragment {
 
     private Tweet tweet;
+    private boolean showMedia;
+    private boolean showActions;
     private ItemTweetBinding binding;
 
     public static final String TAG = TweetFragment.class.getSimpleName();
@@ -30,10 +32,12 @@ public class TweetFragment extends Fragment {
         return replyClickSubject;
     }
 
-    public static TweetFragment newInstance(Tweet tweet) {
+    public static TweetFragment newInstance(Tweet tweet, boolean showMedia, boolean showActions) {
         TweetFragment f = new TweetFragment();
         Bundle args = new Bundle();
         args.putParcelable("tweet", Parcels.wrap(tweet));
+        args.putBoolean("show_media", showMedia);
+        args.putBoolean("show_actions", showActions);
         f.setArguments(args);
 
         return f;
@@ -52,12 +56,22 @@ public class TweetFragment extends Fragment {
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         tweet = Parcels.unwrap(getArguments().getParcelable("tweet"));
+        showMedia = getArguments().getBoolean("show_media");
+        showActions = getArguments().getBoolean("show_actions");
         binding.setTweet(tweet);
         binding.executePendingBindings();
 
         binding.btnReply.setOnClickListener(v -> {
             replyClickSubject.onNext(tweet);
         });
+
+        if (!showMedia) {
+            binding.ivMedia.setVisibility(View.GONE);
+        }
+
+        if (!showActions) {
+            binding.llActions.setVisibility(View.GONE);
+        }
     }
 
     @Override

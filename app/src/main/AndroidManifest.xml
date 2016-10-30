@@ -42,7 +42,11 @@
             </intent-filter>
         </activity>
         <activity android:name=".activities.TimelineActivity" />
-        <activity android:name=".activities.TweetActivity"></activity>
+        <activity android:name=".activities.TweetActivity" />
+        <activity
+            android:name=".activities.ImageActivity"
+            android:theme="@style/Theme.AppCompat.NoActionBar">
+        </activity>
     </application>
 
 </manifest>

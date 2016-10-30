@@ -55,6 +55,7 @@ dependencies {
     compile 'com.github.bumptech.glide:glide:3.5.2'
     compile 'jp.wasabeef:picasso-transformations:2.1.0'
     compile 'jp.co.cyberagent.android.gpuimage:gpuimage-library:1.4.1'
+    compile 'com.github.liuguangqiang.swipeback:library:1.0.2@aar'
     // Android Async Http for sending async network requests
     compile 'com.loopj.android:android-async-http:1.4.9'
     // DBFlow for simple persistence with an ORM

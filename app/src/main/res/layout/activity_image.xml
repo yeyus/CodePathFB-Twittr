@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.liuguangqiang.swipeback.SwipeBackLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/swipeBackLayout"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+    <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        xmlns:tools="http://schemas.android.com/tools"
+        android:id="@+id/activity_image"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/twitter_darker_grey"
+        tools:context="com.codepath.apps.twitterapp.activities.ImageActivity">
+
+        <ImageView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            app:srcCompat="@drawable/egg"
+            android:layout_alignParentTop="true"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true"
+            android:id="@+id/ivMedia" />
+
+        <FrameLayout
+            android:id="@+id/fragmentTweet"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentEnd="true"
+            android:padding="@dimen/tweet_elm_guard"
+            android:background="@color/tweet_transparent_bg">
+        </FrameLayout>
+
+    </RelativeLayout>
+</com.liuguangqiang.swipeback.SwipeBackLayout>

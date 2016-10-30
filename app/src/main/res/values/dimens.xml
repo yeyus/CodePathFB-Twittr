@@ -5,5 +5,7 @@
     <dimen name="activity_vertical_margin">16dp</dimen>
     <dimen name="activity_bleed_margin">0dp</dimen>
     <dimen name="label_margin">6dp</dimen>
+    <dimen name="tweet_media_max_height">150dp</dimen>
+    <dimen name="tweet_elm_guard">10dp</dimen>
 
 </resources>

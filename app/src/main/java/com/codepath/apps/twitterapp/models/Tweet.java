@@ -5,6 +5,7 @@ import android.text.format.DateUtils;
 import com.codepath.apps.twitterapp.MyDatabase;
 import com.raizlabs.android.dbflow.annotation.Column;
 import com.raizlabs.android.dbflow.annotation.ForeignKey;
+import com.raizlabs.android.dbflow.annotation.OneToMany;
 import com.raizlabs.android.dbflow.annotation.PrimaryKey;
 import com.raizlabs.android.dbflow.annotation.Table;
 import com.raizlabs.android.dbflow.sql.language.SQLite;
@@ -46,6 +47,8 @@ public class Tweet extends BaseModel {
 
     @Column
     Integer favouritesCount = 0;
+
+    List<MediaEntity> media;
 
     public Tweet() { super(); }
 
@@ -106,6 +109,26 @@ public class Tweet extends BaseModel {
         return strDate;
     }
 
+    public String getAnyMedia() {
+        String url = null;
+        if (media != null && !media.isEmpty()) {
+            url = media.get(0).getMediaUrl();
+        }
+
+        return url;
+    }
+
+    @OneToMany(methods = {OneToMany.Method.ALL}, variableName = "media")
+    public List<MediaEntity> getMedia() {
+        if (media == null || media.isEmpty()) {
+            media = SQLite.select()
+                    .from(MediaEntity.class)
+                    .where(MediaEntity_Table.tweetUid.eq(uid))
+                    .queryList();
+        }
+        return media;
+    }
+
     public static Tweet fromJSON(JSONObject jsonObject) {
         Tweet tw = new Tweet();
 
@@ -120,11 +143,31 @@ public class Tweet extends BaseModel {
             if(!jsonObject.isNull("favourites_count")) {
                 tw.favouritesCount = jsonObject.getInt("favourites_count");
             }
+            if(!jsonObject.isNull("entities")) {
+                JSONObject entitiesObj = jsonObject.getJSONObject("entities");
+                if(!entitiesObj.isNull("media")) {
+                    List<MediaEntity> media = MediaEntity.fromJSONArray(entitiesObj.getJSONArray("media"));
+                    for (MediaEntity m : media) {
+                        m.tweetUid = tw.getUid();
+                    }
+                    tw.media = media;
+                }
+            }
         } catch (JSONException e) {
             e.printStackTrace();
         }
 
         return tw;
+    }
+
+    public void persist() {
+        this.getUser().save();
+        if (!this.getMedia().isEmpty()) {
+            for(MediaEntity m: this.getMedia()) {
+                m.save();
+            }
+        }
+        this.save();
     }
 
     public static ArrayList<Tweet> fromJSONArray(JSONArray jsonArray) {

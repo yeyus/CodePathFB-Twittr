@@ -18,6 +18,12 @@
         <item name="android:windowBackground">@color/twitter_lighter_grey</item>
     </style>
 
+    <style name="Theme.Swipe.Back" parent="Theme.AppCompat.Light.DarkActionBar">
+        <item name="android:windowIsTranslucent">true</item>
+        <item name="android:windowBackground">@android:color/transparent</item>
+        <item name="windowActionBar">false</item>
+        <item name="android:windowNoTitle">true</item>
+    </style>
 
     <style name="TwitterActionBar" parent="Widget.AppCompat.Light.ActionBar.Solid.Inverse">
         <item name="android:background">@color/twitter_blue</item>
@@ -39,4 +45,5 @@
     <color name="twitter_grey">#ff8899a6</color>
     <color name="twitter_dark_grey">#ff66757f</color>
     <color name="twitter_darker_grey">#ff292f33</color>
+    <color name="tweet_transparent_bg">#80000000</color>
 </resources>
