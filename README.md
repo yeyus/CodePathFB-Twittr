@@ -2,7 +2,7 @@
 
 **Twittr** is an android app that allows a user to view his Twitter timeline and post a new tweet. The app utilizes [Twitter REST API](https://dev.twitter.com/rest/public).
 
-Time spent: **18** hours spent in total
+Time spent: **25** hours spent in total
 
 ## User Stories
 
@@ -48,12 +48,14 @@ The following **additional** features are implemented:
 
 * [x] Image activity with swipe to dismiss
 * [x] Reactive listeners
+* [x] Retweets are rendered as the original tweet + RT badge on top
+* [x] Tweet view is handled as a fragment to reuse across different activities
 
 ## Video Walkthrough
 
 Here's a walkthrough of implemented user stories:
 
-<img src='http://i.imgur.com/link/to/your/gif/file.gif' title='Video Walkthrough' width='' alt='Video Walkthrough' />
+[Walkthrough](http://i.imgur.com/4Obwtkq.mp4)
 
 GIF created with [LiceCap](http://www.cockos.com/licecap/).
 
