@@ -150,6 +150,7 @@ public class Tweet extends BaseModel {
         Tweet tw = new Tweet();
 
         try {
+            tw.uid = jsonObject.getLong("id");
             if(!jsonObject.isNull("retweeted_status")) {
                 tw.retweetedBy = User.fromJSON(jsonObject.getJSONObject("user")).getName();
                 jsonObject = jsonObject.getJSONObject("retweeted_status");
@@ -160,7 +161,6 @@ public class Tweet extends BaseModel {
             }
 
             tw.body = jsonObject.getString("text");
-            tw.uid = jsonObject.getLong("id");
             tw.createdAt = jsonObject.getString("created_at");
             tw.user = User.fromJSON(jsonObject.getJSONObject("user"));
             if(!jsonObject.isNull("retweet_count")) {

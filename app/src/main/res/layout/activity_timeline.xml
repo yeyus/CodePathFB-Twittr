@@ -26,17 +26,12 @@
             app:layout_scrollFlags="scroll|enterAlways" />
     </android.support.design.widget.AppBarLayout>
 
-    <android.support.v4.widget.SwipeRefreshLayout
-        android:id="@+id/swipeContainer"
+    <FrameLayout
+        android:id="@+id/fragmentTimeline"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:clipToPadding="false"
-        app:layout_behavior="@string/appbar_scrolling_view_behavior">
-        <android.support.v7.widget.RecyclerView
-            android:id="@+id/rvTweets"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent" />
-    </android.support.v4.widget.SwipeRefreshLayout>
+        android:clipToPadding="false">
+    </FrameLayout>
 
     <android.support.design.widget.FloatingActionButton
         android:id="@+id/fabCompose"
@@ -46,7 +41,7 @@
         android:layout_margin="16dp"
         android:tint="@color/twitter_light_grey"
         android:src="@drawable/ic_compose_tweet_24dp"
-        app:layout_anchor="@id/rvTweets"
+        app:layout_anchor="@id/fragmentTimeline"
         app:layout_anchorGravity="bottom|right|end" />
 
 </android.support.design.widget.CoordinatorLayout>

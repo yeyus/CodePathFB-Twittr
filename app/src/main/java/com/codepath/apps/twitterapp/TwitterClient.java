@@ -1,6 +1,7 @@
 package com.codepath.apps.twitterapp;
 
 import android.content.Context;
+import android.util.Log;
 
 import com.codepath.apps.twitterapp.models.TimelineRequest;
 import com.codepath.apps.twitterapp.models.Tweet;
@@ -33,6 +34,9 @@ import rx.Observable;
  * 
  */
 public class TwitterClient extends OAuthBaseClient {
+
+	public static final String TAG = TwitterClient.class.getSimpleName();
+
 	public static final Class<? extends Api> REST_API_CLASS = TwitterApi.class; // Change this
 	public static final String REST_URL = "https://api.twitter.com/1.1/"; // Change this, base API URL
 	public static final String REST_CONSUMER_KEY = "R37ou6CF9ybUZijkCvxj2oxdl";       // Change this
@@ -77,13 +81,14 @@ public class TwitterClient extends OAuthBaseClient {
                         public void onSuccess(int statusCode, Header[] headers, JSONArray response) {
                             if (!subscriber.isUnsubscribed()) {
                                 ArrayList<Tweet> tweets = Tweet.fromJSONArray(response);
+								Log.i(TAG, String.format("Received %d tweets", tweets.size()));
                                 for (Tweet t: tweets) {
                                     subscriber.onNext(t);
                                 }
+                                Log.i(TAG, String.format("Closing connection and observable"));
                                 subscriber.onCompleted();
                             }
                         }
-
 
                         @Override
                         public void onFailure(int statusCode, Header[] headers, Throwable throwable, JSONObject errorResponse) {
