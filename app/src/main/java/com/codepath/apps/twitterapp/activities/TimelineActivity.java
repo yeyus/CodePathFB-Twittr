@@ -23,9 +23,14 @@ import com.codepath.apps.twitterapp.TwitterClient;
 import com.codepath.apps.twitterapp.fragments.ComposeTweetDialogFragment;
 import com.codepath.apps.twitterapp.fragments.HomeTimelineFragment;
 import com.codepath.apps.twitterapp.fragments.MentionsTimelineFragment;
+import com.codepath.apps.twitterapp.fragments.ProfileFragment;
 import com.codepath.apps.twitterapp.models.Tweet;
+import com.codepath.apps.twitterapp.models.User;
 
 import org.parceler.Parcels;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -39,11 +44,13 @@ public class TimelineActivity extends AppCompatActivity {
     public static final String TAG = TimelineActivity.class.getSimpleName();
 
     private TwitterClient client;
+    private User user;
 
     private View rootView;
-    private FragmentPagerAdapter adapterViewPager;
+    private TimelineAdapter adapterViewPager;
     private HomeTimelineFragment homeTimelineFragment;
     private MentionsTimelineFragment mentionsTimelineFragment;
+    private ProfileFragment profileFragment;
 
     @BindView(R.id.fabCompose) FloatingActionButton fabCompose;
     @BindView(R.id.toolbar) Toolbar toolbar;
@@ -67,6 +74,12 @@ public class TimelineActivity extends AppCompatActivity {
 
         client = TwitterApplication.getRestClient();
 
+        client.getAccount().subscribe(user -> {
+            profileFragment = ProfileFragment.newInstance(user);
+            adapterViewPager.addTab(profileFragment);
+            adapterViewPager.notifyDataSetChanged();
+        });
+
         setupViewPager();
         setupListeners();
 
@@ -85,7 +98,11 @@ public class TimelineActivity extends AppCompatActivity {
     private void setupViewPager() {
         homeTimelineFragment = new HomeTimelineFragment();
         mentionsTimelineFragment = new MentionsTimelineFragment();
-        adapterViewPager = new TimelineAdapter(getSupportFragmentManager(), this, homeTimelineFragment, mentionsTimelineFragment);
+        profileFragment = ProfileFragment.newInstance(user);
+        adapterViewPager = new TimelineAdapter(getSupportFragmentManager(), this);
+        adapterViewPager.addTab(homeTimelineFragment);
+        adapterViewPager.addTab(mentionsTimelineFragment);
+        adapterViewPager.notifyDataSetChanged();
         vpPages.setAdapter(adapterViewPager);
 
         ptsHeader.setDrawFullUnderline(true);
@@ -165,49 +182,46 @@ public class TimelineActivity extends AppCompatActivity {
     }
 
     public static class TimelineAdapter extends FragmentPagerAdapter {
-        private static int NUM_ITEMS = 2;
+        private List<Fragment> fragments;
 
         Context context;
-        HomeTimelineFragment homeTimelineFragment;
-        MentionsTimelineFragment mentionsTimelineFragment;
 
-        public TimelineAdapter(FragmentManager fragmentManager, Context context, HomeTimelineFragment homeTimeline, MentionsTimelineFragment mentionsTimeline) {
+        public TimelineAdapter(FragmentManager fragmentManager,
+                               Context context) {
             super(fragmentManager);
             this.context = context;
-            this.homeTimelineFragment = homeTimeline;
-            this.mentionsTimelineFragment = mentionsTimeline;
+            this.fragments = new ArrayList<>();
         }
 
         // Returns total number of pages
         @Override
         public int getCount() {
-            return NUM_ITEMS;
+            return fragments.size();
         }
 
         // Returns the fragment to display for that page
         @Override
         public Fragment getItem(int position) {
-            switch (position) {
-                case 0: // Fragment # 0 - This will show FirstFragment
-                    return homeTimelineFragment;
-                case 1: // Fragment # 0 - This will show FirstFragment different title
-                    return mentionsTimelineFragment;
-                default:
-                    return null;
-            }
+            return fragments.get(position);
         }
 
         // Returns the page title for the top indicator
         @Override
         public CharSequence getPageTitle(int position) {
-            switch (position) {
-                case 0:
-                    return context.getResources().getString(R.string.tab_timeline);
-                case 1:
-                    return context.getString(R.string.tab_mentions);
-                default:
-                    return null;
+            Fragment f = fragments.get(position);
+            if (f instanceof HomeTimelineFragment) {
+                return context.getResources().getString(R.string.tab_timeline);
+            } else if (f instanceof MentionsTimelineFragment) {
+                return context.getResources().getString(R.string.tab_mentions);
+            } else if (f instanceof ProfileFragment) {
+                return context.getResources().getString(R.string.tab_me);
             }
+
+            return "Unknown";
+        }
+
+        public void addTab(Fragment tab) {
+            fragments.add(tab);
         }
 
     }

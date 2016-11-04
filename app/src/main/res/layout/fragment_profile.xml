@@ -1,0 +1,119 @@
+<layout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <data>
+        <variable name="user" type="com.codepath.apps.twitterapp.models.User"/>
+    </data>
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        tools:context=".activities.ProfileActivity">
+
+        <RelativeLayout
+            android:id="@+id/rlHeader"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentTop="true"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true">
+
+            <ImageView
+                android:id="@+id/ivBanner"
+                app:imageUrl='@{user.profileBannerUrl}'
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:minHeight="50dp"
+                android:adjustViewBounds="true"
+                android:scaleType="centerInside"
+                android:layout_alignParentTop="true"
+                android:layout_alignParentLeft="true"
+                android:layout_alignParentStart="true"/>
+
+            <ImageView
+                android:id="@+id/ivProfileImage"
+                app:imageUrl='@{user.profileImageUrl}'
+                android:layout_width="50dp"
+                android:layout_height="50dp"
+                android:layout_below="@id/ivBanner"
+                android:layout_marginTop="-30dp"
+                android:layout_marginRight="16dp"
+                android:layout_marginLeft="16dp"/>
+
+            <TextView
+                android:id="@+id/tvName"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                android:text='@{user.screenName}'
+                tools:text="Screen Name"
+                android:layout_alignTop="@id/ivProfileImage"
+                android:layout_toRightOf="@+id/ivProfileImage"
+                android:layout_toEndOf="@+id/ivProfileImage" />
+
+            <TextView
+                android:id="@+id/tvScreenName"
+                android:layout_below="@+id/tvName"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textAppearance="?android:attr/textAppearanceSmall"
+                android:text='@{user.name}'
+                tools:text="Screen Name"
+                android:layout_toRightOf="@+id/ivProfileImage"
+                android:layout_toEndOf="@+id/ivProfileImage" />
+
+            <TextView
+                android:id="@+id/tvTagline"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                android:text='@{user.description}'
+                tools:text="Tagline"
+                android:layout_below="@+id/ivProfileImage"
+                android:layout_centerHorizontal="true"
+                android:layout_marginTop="10dp"
+                android:layout_marginRight="16dp"
+                android:layout_marginLeft="16dp"/>
+
+            <LinearLayout
+                android:orientation="horizontal"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:layout_alignParentLeft="true"
+                android:layout_alignParentStart="true"
+                android:layout_below="@+id/tvTagline"
+                android:gravity="center"
+                android:layout_marginRight="16dp"
+                android:layout_marginLeft="16dp"
+                android:padding="10dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textAppearance="?android:attr/textAppearanceMedium"
+                    android:text='@{user.following + ` following`}'
+                    tools:text="X Following"
+                    android:id="@+id/tvFollowing"
+                    android:layout_marginRight="30dp" />
+
+                <TextView
+                    android:id="@+id/tvFollowers"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textAppearance="?android:attr/textAppearanceMedium"
+                    android:text='@{user.followers + ` followers`}'
+                    tools:text="X Followers" />
+            </LinearLayout>
+
+        </RelativeLayout>
+
+        <FrameLayout
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent"
+            android:layout_below="@+id/rlHeader"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true"
+            android:id="@+id/flContainer">
+        </FrameLayout>
+    </RelativeLayout>
+</layout>

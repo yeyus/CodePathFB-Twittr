@@ -17,5 +17,6 @@
     <string name="dialog_save_as_draft">Do you want to save as a draft?</string>
     <string name="tab_timeline">Timeline</string>
     <string name="tab_mentions">Mentions</string>
+    <string name="tab_me">Me</string>
 
 </resources>

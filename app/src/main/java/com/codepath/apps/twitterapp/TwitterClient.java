@@ -227,6 +227,28 @@ public class TwitterClient extends OAuthBaseClient {
 		getClient().get(apiUrl, null, handler);
 	}
 
+    public Observable<User> getAccount() {
+        return Observable.create(subscriber -> {
+            getAccount(new JsonHttpResponseHandler() {
+                @Override
+                public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
+                    if (!subscriber.isUnsubscribed()) {
+                        subscriber.onNext(User.fromJSON(response));
+                        subscriber.onCompleted();
+                    }
+                }
+
+
+                @Override
+                public void onFailure(int statusCode, Header[] headers, Throwable throwable, JSONObject errorResponse) {
+                    if (!subscriber.isUnsubscribed()) {
+                        subscriber.onError(throwable);
+                    }
+                }
+            });
+        });
+    }
+
 	public void setUserProfile(User userProfile) {
 		this.userProfile = userProfile;
 	}

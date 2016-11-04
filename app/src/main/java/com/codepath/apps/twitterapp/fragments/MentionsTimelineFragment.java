@@ -11,4 +11,5 @@ public class MentionsTimelineFragment extends TimelineFragment {
     public Observable<Tweet> fetch(TimelineRequest request) {
         return client.getMentionsTimeline(request);
     }
+
 }
