@@ -12,13 +12,14 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.codepath.apps.twitterapp.EndlessRecyclerViewScrollListener;
 import com.codepath.apps.twitterapp.R;
 import com.codepath.apps.twitterapp.TwitterApplication;
 import com.codepath.apps.twitterapp.TwitterClient;
 import com.codepath.apps.twitterapp.adapters.TweetsAdapter;
 import com.codepath.apps.twitterapp.models.TimelineRequest;
 import com.codepath.apps.twitterapp.models.Tweet;
+import com.codepath.apps.twitterapp.models.User;
+import com.codepath.apps.twitterapp.thirdparty.EndlessRecyclerViewScrollListener;
 import com.codepath.apps.twitterapp.thirdparty.SimpleDividerItemDecoration;
 
 import java.util.ArrayList;
@@ -38,6 +39,7 @@ public abstract class TimelineFragment extends Fragment {
 
     private final PublishSubject<Tweet> replyClickSubject = PublishSubject.create();
     private final PublishSubject<Tweet> tweetClickSubject = PublishSubject.create();
+    private final PublishSubject<User> profileClickSubject = PublishSubject.create();
 
     protected TwitterClient client;
 
@@ -105,8 +107,8 @@ public abstract class TimelineFragment extends Fragment {
 
     private void setupListeners() {
         tweetsAdapter.getReplyClickSubject().subscribe(tweet -> replyClickSubject.onNext(tweet));
-
         tweetsAdapter.getTweetClickSubject().subscribe(tweet -> tweetClickSubject.onNext(tweet));
+        tweetsAdapter.getProfileClickSubject().subscribe(user -> profileClickSubject.onNext(user));
 
         // Pull to refresh
         swipeContainer.setOnRefreshListener(() -> {
@@ -153,6 +155,10 @@ public abstract class TimelineFragment extends Fragment {
 
     public Observable<Tweet> getOnTweetClickObservable() {
         return tweetClickSubject;
+    }
+
+    public Observable<User> getProfileClickObservable() {
+        return profileClickSubject;
     }
 
     public void addTweet(Tweet t) {

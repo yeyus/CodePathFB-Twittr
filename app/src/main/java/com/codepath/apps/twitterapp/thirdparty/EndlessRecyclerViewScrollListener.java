@@ -1,4 +1,4 @@
-package com.codepath.apps.twitterapp;
+package com.codepath.apps.twitterapp.thirdparty;
 
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;

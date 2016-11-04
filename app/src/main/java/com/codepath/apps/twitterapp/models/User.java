@@ -5,7 +5,6 @@ import android.widget.ImageView;
 
 import com.bumptech.glide.Glide;
 import com.codepath.apps.twitterapp.MyDatabase;
-import com.codepath.apps.twitterapp.R;
 import com.raizlabs.android.dbflow.annotation.Column;
 import com.raizlabs.android.dbflow.annotation.PrimaryKey;
 import com.raizlabs.android.dbflow.annotation.Table;
@@ -35,6 +34,9 @@ public class User extends BaseModel {
     String profileImageUrl;
 
     @Column
+    String profileBannerUrl;
+
+    @Column
     Integer followers;
 
     @Column
@@ -61,6 +63,10 @@ public class User extends BaseModel {
         return profileImageUrl.replace("_normal", "_bigger");
     }
 
+    public String getProfileBannerUrl() {
+        return profileBannerUrl;
+    }
+
     public int getFollowers() {
         return followers;
     }
@@ -79,7 +85,6 @@ public class User extends BaseModel {
                 .load(imageUrl)
                 .bitmapTransform(new RoundedCornersTransformation(view.getContext(), 5, 5))
                 // TODO find placeholder
-                .placeholder(R.drawable.egg)
                 .into(view);
     }
 
@@ -94,6 +99,7 @@ public class User extends BaseModel {
             u.followers = jsonObject.getInt("followers_count");
             u.following = jsonObject.getInt("friends_count");
             u.description = jsonObject.getString("description");
+            u.profileBannerUrl = jsonObject.getString("profile_banner_url");
         } catch (JSONException e) {
             e.printStackTrace();
         }

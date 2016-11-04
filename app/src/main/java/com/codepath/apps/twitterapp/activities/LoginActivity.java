@@ -1,10 +1,12 @@
-package com.codepath.apps.twitterapp;
+package com.codepath.apps.twitterapp.activities;
 
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.View;
 
+import com.codepath.apps.twitterapp.R;
+import com.codepath.apps.twitterapp.TwitterClient;
 import com.codepath.apps.twitterapp.activities.TimelineActivity;
 import com.codepath.oauth.OAuthLoginActionBarActivity;
 

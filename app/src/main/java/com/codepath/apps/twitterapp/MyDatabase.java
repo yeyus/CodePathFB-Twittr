@@ -7,5 +7,5 @@ public class MyDatabase {
 
     public static final String NAME = "RestClientDatabase";
 
-    public static final int VERSION = 2;
+    public static final int VERSION = 3;
 }

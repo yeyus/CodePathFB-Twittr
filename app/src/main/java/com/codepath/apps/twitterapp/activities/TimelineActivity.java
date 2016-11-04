@@ -111,6 +111,17 @@ public class TimelineActivity extends AppCompatActivity {
                     startActivity(i);
                 }
             );
+
+        Observable.merge(
+                homeTimelineFragment.getProfileClickObservable(),
+                mentionsTimelineFragment.getProfileClickObservable()
+            ).subscribe(
+                user -> {
+                    Intent i = new Intent(TimelineActivity.this, ProfileActivity.class);
+                    i.putExtra("user", Parcels.wrap(user));
+                    startActivity(i);
+                }
+            );
     }
 
     private void addTweet(Tweet t) {

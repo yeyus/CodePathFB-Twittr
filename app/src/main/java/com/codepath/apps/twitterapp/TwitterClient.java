@@ -161,6 +161,38 @@ public class TwitterClient extends OAuthBaseClient {
 		getClient().get(apiUrl, params, handler);
 	}
 
+    public Observable<Tweet> getUserTimeline(String screenName, TimelineRequest request) {
+        return Observable.create(subscriber -> {
+            getUserTimeline(
+                    screenName,
+                    request.getCount(),
+                    request.getSinceId(),
+                    request.getMaxId(),
+                    new JsonHttpResponseHandler() {
+                        @Override
+                        public void onSuccess(int statusCode, Header[] headers, JSONArray response) {
+                            if (!subscriber.isUnsubscribed()) {
+                                ArrayList<Tweet> tweets = Tweet.fromJSONArray(response);
+                                Log.i(TAG, String.format("Received %d tweets", tweets.size()));
+                                for (Tweet t: tweets) {
+                                    subscriber.onNext(t);
+                                }
+                                Log.i(TAG, String.format("Closing connection and observable"));
+                                subscriber.onCompleted();
+                            }
+                        }
+
+                        @Override
+                        public void onFailure(int statusCode, Header[] headers, Throwable throwable, JSONObject errorResponse) {
+                            if (!subscriber.isUnsubscribed()) {
+                                subscriber.onError(throwable);
+                            }
+                        }
+                    }
+            );
+        });
+    }
+
 	public void postTweet(String body, AsyncHttpResponseHandler handler) {
 		String apiUrl = getApiUrl("statuses/update.json");
 		RequestParams params = new RequestParams();

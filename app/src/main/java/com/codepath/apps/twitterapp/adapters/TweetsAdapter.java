@@ -11,6 +11,7 @@ import com.codepath.apps.twitterapp.R;
 import com.codepath.apps.twitterapp.activities.ImageActivity;
 import com.codepath.apps.twitterapp.databinding.ItemTweetBinding;
 import com.codepath.apps.twitterapp.models.Tweet;
+import com.codepath.apps.twitterapp.models.User;
 
 import org.parceler.Parcels;
 
@@ -32,6 +33,7 @@ public class TweetsAdapter extends RecyclerView.Adapter<TweetsAdapter.ViewHolder
     public static final String TAG = TweetsAdapter.class.getSimpleName();
     private final PublishSubject<Tweet> replyClickSubject = PublishSubject.create();
     private final PublishSubject<Tweet> tweetClickSubject = PublishSubject.create();
+    private final PublishSubject<User> profileClickSubject = PublishSubject.create();
 
     private List<Tweet> mTweets;
     private Context mContext;
@@ -47,6 +49,10 @@ public class TweetsAdapter extends RecyclerView.Adapter<TweetsAdapter.ViewHolder
 
     public PublishSubject<Tweet> getTweetClickSubject() {
         return tweetClickSubject;
+    }
+
+    public PublishSubject<User> getProfileClickSubject() {
+        return profileClickSubject;
     }
 
     @Override
@@ -70,6 +76,7 @@ public class TweetsAdapter extends RecyclerView.Adapter<TweetsAdapter.ViewHolder
             replyClickSubject.onNext(tweet);
         });
         holder.binding.tvBody.setOnClickListener(view -> tweetClickSubject.onNext(tweet));
+        holder.binding.ivProfileImage.setOnClickListener(view -> profileClickSubject.onNext(tweet.getUser()));
         holder.binding.ivMedia.setOnClickListener(view -> {
             Intent i = new Intent(mContext, ImageActivity.class);
             i.putExtra("tweet", Parcels.wrap(tweet));
