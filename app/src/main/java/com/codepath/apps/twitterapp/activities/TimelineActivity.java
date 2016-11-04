@@ -1,12 +1,16 @@
 package com.codepath.apps.twitterapp.activities;
 
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
+import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentTransaction;
+import android.support.v4.app.FragmentPagerAdapter;
+import android.support.v4.view.PagerTabStrip;
+import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
@@ -18,7 +22,7 @@ import com.codepath.apps.twitterapp.TwitterApplication;
 import com.codepath.apps.twitterapp.TwitterClient;
 import com.codepath.apps.twitterapp.fragments.ComposeTweetDialogFragment;
 import com.codepath.apps.twitterapp.fragments.HomeTimelineFragment;
-import com.codepath.apps.twitterapp.fragments.TimelineFragment;
+import com.codepath.apps.twitterapp.fragments.MentionsTimelineFragment;
 import com.codepath.apps.twitterapp.models.Tweet;
 
 import org.parceler.Parcels;
@@ -26,6 +30,9 @@ import org.parceler.Parcels;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
+import rx.Observable;
+
+import static com.codepath.apps.twitterapp.R.id.vpPager;
 
 public class TimelineActivity extends AppCompatActivity {
 
@@ -34,11 +41,15 @@ public class TimelineActivity extends AppCompatActivity {
     private TwitterClient client;
 
     private View rootView;
+    private FragmentPagerAdapter adapterViewPager;
+    private HomeTimelineFragment homeTimelineFragment;
+    private MentionsTimelineFragment mentionsTimelineFragment;
 
     @BindView(R.id.fabCompose) FloatingActionButton fabCompose;
     @BindView(R.id.toolbar) Toolbar toolbar;
     @BindView(R.id.appBar) AppBarLayout appBar;
-    private TimelineFragment mTimelineFragment;
+    @BindView(vpPager) ViewPager vpPages;
+    @BindView(R.id.pager_header) PagerTabStrip ptsHeader;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -56,11 +67,7 @@ public class TimelineActivity extends AppCompatActivity {
 
         client = TwitterApplication.getRestClient();
 
-        mTimelineFragment = new HomeTimelineFragment();
-        FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
-        ft.replace(R.id.fragmentTimeline, mTimelineFragment);
-        ft.commit();
-
+        setupViewPager();
         setupListeners();
 
         // Handling receiving share intents
@@ -75,24 +82,39 @@ public class TimelineActivity extends AppCompatActivity {
         }
     }
 
+    private void setupViewPager() {
+        homeTimelineFragment = new HomeTimelineFragment();
+        mentionsTimelineFragment = new MentionsTimelineFragment();
+        adapterViewPager = new TimelineAdapter(getSupportFragmentManager(), this, homeTimelineFragment, mentionsTimelineFragment);
+        vpPages.setAdapter(adapterViewPager);
+
+        ptsHeader.setDrawFullUnderline(true);
+        ptsHeader.setTabIndicatorColor(getResources().getColor(R.color.twitter_blue));
+    }
+
 
     private void setupListeners() {
-        mTimelineFragment.getOnReplyObservable()
-                .subscribe(
-                        tweet -> openComposeDialog(ComposeTweetDialogFragment.newInstance(tweet))
-                );
+        Observable.merge(
+                homeTimelineFragment.getOnReplyObservable(),
+                mentionsTimelineFragment.getOnReplyObservable()
+            ).subscribe(
+                tweet -> openComposeDialog(ComposeTweetDialogFragment.newInstance(tweet))
+            );
 
-        mTimelineFragment.getOnTweetClickObservable().subscribe(
+        Observable.merge(
+                homeTimelineFragment.getOnTweetClickObservable(),
+                mentionsTimelineFragment.getOnTweetClickObservable()
+            ).subscribe(
                 tweet -> {
                     Intent i = new Intent(TimelineActivity.this, TweetActivity.class);
                     i.putExtra("tweet", Parcels.wrap(tweet));
                     startActivity(i);
                 }
-        );
+            );
     }
 
     private void addTweet(Tweet t) {
-        mTimelineFragment.addTweet(t);
+        homeTimelineFragment.addTweet(t);
     }
 
     private void openComposeDialog(ComposeTweetDialogFragment fragment) {
@@ -129,5 +151,53 @@ public class TimelineActivity extends AppCompatActivity {
                     body.substring(0, Math.min(140, body.length()))
                 )
         );
+    }
+
+    public static class TimelineAdapter extends FragmentPagerAdapter {
+        private static int NUM_ITEMS = 2;
+
+        Context context;
+        HomeTimelineFragment homeTimelineFragment;
+        MentionsTimelineFragment mentionsTimelineFragment;
+
+        public TimelineAdapter(FragmentManager fragmentManager, Context context, HomeTimelineFragment homeTimeline, MentionsTimelineFragment mentionsTimeline) {
+            super(fragmentManager);
+            this.context = context;
+            this.homeTimelineFragment = homeTimeline;
+            this.mentionsTimelineFragment = mentionsTimeline;
+        }
+
+        // Returns total number of pages
+        @Override
+        public int getCount() {
+            return NUM_ITEMS;
+        }
+
+        // Returns the fragment to display for that page
+        @Override
+        public Fragment getItem(int position) {
+            switch (position) {
+                case 0: // Fragment # 0 - This will show FirstFragment
+                    return homeTimelineFragment;
+                case 1: // Fragment # 0 - This will show FirstFragment different title
+                    return mentionsTimelineFragment;
+                default:
+                    return null;
+            }
+        }
+
+        // Returns the page title for the top indicator
+        @Override
+        public CharSequence getPageTitle(int position) {
+            switch (position) {
+                case 0:
+                    return context.getResources().getString(R.string.tab_timeline);
+                case 1:
+                    return context.getString(R.string.tab_mentions);
+                default:
+                    return null;
+            }
+        }
+
     }
 }
