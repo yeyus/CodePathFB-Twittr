@@ -115,10 +115,11 @@ public class ComposeTweetDialogFragment extends DialogFragment {
             tvInReplyTo.setText(String.format(
                     getResources().getString(R.string.in_reply_to),
                     inReplyTo.getUser().getName()));
-            etBody.setText("@" + inReplyTo.getUser().getName() + " ");
+            etBody.setText("@" + inReplyTo.getUser().getScreenName() + " ");
             etBody.setSelection(etBody.getText().length());
         } else {
             toolbar.setTitle(R.string.compose_tweet_title);
+            etBody.setText(pref.getString("lastTweet", ""));
         }
 
         if (body != null) {
@@ -126,7 +127,7 @@ public class ComposeTweetDialogFragment extends DialogFragment {
         }
 
         txtCharCount = toolbar.getMenu().findItem(R.id.txtCharsLeft);
-        etBody.setText(pref.getString("lastTweet", ""));
+
         tvInReplyTo.setVisibility(inReplyTo == null ? View.GONE : View.VISIBLE);
 
         setupListeners();
