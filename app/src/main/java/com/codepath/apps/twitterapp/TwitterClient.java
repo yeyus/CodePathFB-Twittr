@@ -12,6 +12,7 @@ import com.loopj.android.http.JsonHttpResponseHandler;
 import com.loopj.android.http.RequestParams;
 
 import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
 import org.scribe.builder.api.Api;
 import org.scribe.builder.api.TwitterApi;
@@ -45,16 +46,6 @@ public class TwitterClient extends OAuthBaseClient {
 
 	public TwitterClient(Context context) {
 		super(context, REST_API_CLASS, REST_URL, REST_CONSUMER_KEY, REST_CONSUMER_SECRET, REST_CALLBACK_URL);
-	}
-
-	private User userProfile;
-
-	public void getInterestingnessList(AsyncHttpResponseHandler handler) {
-		String apiUrl = getApiUrl("?nojsoncallback=1&method=flickr.interestingness.getList");
-		// Can specify query string params directly or through RequestParams.
-		RequestParams params = new RequestParams();
-		params.put("format", "json");
-		client.get(apiUrl, params, handler);
 	}
 
 	public void getHomeTimeline(int count, long since_id, long max_id, AsyncHttpResponseHandler handler) {
@@ -249,12 +240,58 @@ public class TwitterClient extends OAuthBaseClient {
         });
     }
 
-	public void setUserProfile(User userProfile) {
-		this.userProfile = userProfile;
-	}
+    public void getSearchTimeline(String query, int count, long since_id, long max_id, AsyncHttpResponseHandler handler) {
+        String apiUrl = getApiUrl("search/tweets.json");
+        RequestParams params = new RequestParams();
+        params.put("count", String.valueOf(count));
+        if (since_id > 0) {
+            params.put("since_id", String.valueOf(since_id));
+        }
+        if(max_id > 0) {
+            params.put("max_id", String.valueOf(max_id));
+        }
+        if(query != null) {
+            params.put("q", query);
+        }
+        getClient().get(apiUrl, params, handler);
+    }
 
-	public User getUserProfile() {
-		return  userProfile;
-	}
+    public Observable<Tweet> getSearchTimeline(String query, TimelineRequest request) {
+        return Observable.create(subscriber -> {
+            getSearchTimeline(
+                    query,
+                    request.getCount(),
+                    request.getSinceId(),
+                    request.getMaxId(),
+                    new JsonHttpResponseHandler() {
+                        @Override
+                        public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
+                            if (!subscriber.isUnsubscribed()) {
+                                try {
+                                    JSONArray statuses = response.getJSONArray("statuses");
+                                    ArrayList<Tweet> tweets = Tweet.fromJSONArray(statuses);
+                                    Log.i(TAG, String.format("Received %d tweets", tweets.size()));
+                                    for (Tweet t: tweets) {
+                                        subscriber.onNext(t);
+                                    }
+                                    Log.i(TAG, String.format("Closing connection and observable"));
+                                } catch (JSONException e) {
+                                    subscriber.onError(e);
+                                } finally {
+                                    subscriber.onCompleted();
+                                }
+                            }
+                        }
+
+                        @Override
+                        public void onFailure(int statusCode, Header[] headers, Throwable throwable, JSONObject errorResponse) {
+                            if (!subscriber.isUnsubscribed()) {
+                                subscriber.onError(throwable);
+                            }
+                        }
+                    }
+            );
+        });
+    }
 
 }

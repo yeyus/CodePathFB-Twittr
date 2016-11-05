@@ -4,6 +4,7 @@ import android.os.Bundle;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
+import android.view.MenuItem;
 
 import com.codepath.apps.twitterapp.R;
 import com.codepath.apps.twitterapp.TwitterApplication;
@@ -36,6 +37,11 @@ public class TweetActivity extends AppCompatActivity {
         ft.replace(R.id.fragmentTweet, fragmentTweet);
         ft.commit();
 
+        if (getSupportActionBar() != null) {
+            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+            getSupportActionBar().setDisplayShowHomeEnabled(true);
+        }
+
         fragmentTweet.getReplyClickSubject()
                 .subscribe(tweet -> openComposeDialog(
                         ComposeTweetDialogFragment.newInstance(tweet)));
@@ -51,5 +57,14 @@ public class TweetActivity extends AppCompatActivity {
         fragment.show(fm, "fragment_compose_tweet");
     }
 
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        // handle arrow click here
+        if (item.getItemId() == android.R.id.home) {
+            finish(); // close this activity and return to preview activity (if there is any)
+        }
+
+        return super.onOptionsItemSelected(item);
+    }
 
 }
