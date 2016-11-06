@@ -14,6 +14,7 @@ import com.codepath.apps.twitterapp.activities.ImageActivity;
 import com.codepath.apps.twitterapp.databinding.ItemTweetBinding;
 import com.codepath.apps.twitterapp.models.Tweet;
 import com.codepath.apps.twitterapp.models.User;
+import com.codepath.apps.twitterapp.utils.PatternUtils;
 
 import org.parceler.Parcels;
 
@@ -40,6 +41,7 @@ public class TweetsAdapter extends RecyclerView.Adapter<TweetsAdapter.ViewHolder
     private final PublishSubject<User> profileClickSubject = PublishSubject.create();
     private final PublishSubject<Tweet> favoriteClickSubject = PublishSubject.create();
     private final PublishSubject<Tweet> retweetClickSubject = PublishSubject.create();
+    private final PublishSubject<String> spannableClickSubject = PublishSubject.create();
 
     private List<Tweet> mTweets;
     private Context mContext;
@@ -67,6 +69,10 @@ public class TweetsAdapter extends RecyclerView.Adapter<TweetsAdapter.ViewHolder
 
     public PublishSubject<Tweet> getRetweetClickSubject() {
         return retweetClickSubject;
+    }
+
+    public PublishSubject<String> getSpannableClickSubject() {
+        return spannableClickSubject;
     }
 
     @Override
@@ -115,6 +121,11 @@ public class TweetsAdapter extends RecyclerView.Adapter<TweetsAdapter.ViewHolder
             i.putExtra("show_media", false);
             mContext.startActivity(i);
         });
+
+        PatternUtils.INSTANCE.getTweetPattern(holder.binding.tvBody,
+                getContext().getResources().getColor(R.color.twitter_blue))
+                .repeat()
+                .subscribe(str -> spannableClickSubject.onNext(str));
     }
 
     @Override

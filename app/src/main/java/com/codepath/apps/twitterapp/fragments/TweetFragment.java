@@ -1,5 +1,6 @@
 package com.codepath.apps.twitterapp.fragments;
 
+import android.content.Intent;
 import android.databinding.DataBindingUtil;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -11,8 +12,10 @@ import android.view.animation.AnimationUtils;
 import android.widget.ImageButton;
 
 import com.codepath.apps.twitterapp.R;
+import com.codepath.apps.twitterapp.activities.SearchActivity;
 import com.codepath.apps.twitterapp.databinding.ItemTweetBinding;
 import com.codepath.apps.twitterapp.models.Tweet;
+import com.codepath.apps.twitterapp.utils.PatternUtils;
 
 import org.parceler.Parcels;
 
@@ -94,6 +97,15 @@ public class TweetFragment extends Fragment {
                     v.isSelected() ? R.color.twitter_active_fav : R.color.twitter_grey));
             favoriteClickSubject.onNext(tweet);
         });
+
+        PatternUtils.INSTANCE.getTweetPattern(binding.tvBody,
+                getContext().getResources().getColor(R.color.twitter_blue))
+                .repeat()
+                .subscribe(str -> {
+                    Intent i = new Intent(getContext(), SearchActivity.class);
+                    i.putExtra("query", str);
+                    getContext().startActivity(i);
+                });
 
         if (!showMedia) {
             binding.ivMedia.setVisibility(View.GONE);

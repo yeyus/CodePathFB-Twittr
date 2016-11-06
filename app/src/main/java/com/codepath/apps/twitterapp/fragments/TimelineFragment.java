@@ -1,5 +1,6 @@
 package com.codepath.apps.twitterapp.fragments;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.Snackbar;
@@ -14,6 +15,7 @@ import android.view.ViewGroup;
 
 import com.codepath.apps.twitterapp.R;
 import com.codepath.apps.twitterapp.TwitterApplication;
+import com.codepath.apps.twitterapp.activities.SearchActivity;
 import com.codepath.apps.twitterapp.api.TwitterClient;
 import com.codepath.apps.twitterapp.adapters.TweetsAdapter;
 import com.codepath.apps.twitterapp.models.TimelineRequest;
@@ -113,6 +115,11 @@ public abstract class TimelineFragment extends Fragment {
         tweetsAdapter.getProfileClickSubject().subscribe(user -> profileClickSubject.onNext(user));
         tweetsAdapter.getFavoriteClickSubject().subscribe(tweet -> favoriteClickSubject.onNext(tweet));
         tweetsAdapter.getRetweetClickSubject().subscribe(tweet -> retweetClickSubject.onNext(tweet));
+        tweetsAdapter.getSpannableClickSubject().subscribe(str -> {
+            Intent i = new Intent(getContext(), SearchActivity.class);
+            i.putExtra("query", str);
+            getContext().startActivity(i);
+        });
 
         // Pull to refresh
         swipeContainer.setOnRefreshListener(() -> {

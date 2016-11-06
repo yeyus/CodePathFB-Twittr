@@ -6,6 +6,7 @@ import android.util.Log;
 import com.codepath.apps.twitterapp.models.TimelineRequest;
 import com.codepath.apps.twitterapp.models.Tweet;
 import com.codepath.apps.twitterapp.models.User;
+import com.codepath.apps.twitterapp.utils.NetworkState;
 import com.codepath.oauth.OAuthBaseClient;
 import com.loopj.android.http.AsyncHttpResponseHandler;
 import com.loopj.android.http.JsonHttpResponseHandler;
@@ -22,6 +23,7 @@ import java.util.ArrayList;
 import cz.msebera.android.httpclient.Header;
 import rx.Observable;
 import rx.Subscriber;
+import rx.subjects.PublishSubject;
 
 /*
  * 
@@ -45,9 +47,15 @@ public class TwitterClient extends OAuthBaseClient {
 	public static final String REST_CONSUMER_SECRET = "UDKmTrxGXyKE2x2B3qfSserRr0UZNnZ8bd7mkHTfK3zW5rrVCy"; // Change this
 	public static final String REST_CALLBACK_URL = "oauth://tweetsappcallback"; // Change this (here and in manifest)
 
+    private final PublishSubject<NetworkState> requestSubject = PublishSubject.create();
+
 	public TwitterClient(Context context) {
 		super(context, REST_API_CLASS, REST_URL, REST_CONSUMER_KEY, REST_CONSUMER_SECRET, REST_CALLBACK_URL);
 	}
+
+    public PublishSubject<NetworkState> getRequestSubject() {
+        return requestSubject;
+    }
 
     // region Home Timeline
 	public void getHomeTimeline(int count, long since_id, long max_id, AsyncHttpResponseHandler handler) {
@@ -64,14 +72,14 @@ public class TwitterClient extends OAuthBaseClient {
 	}
 
     public Observable<Tweet> getHomeTimeline(TimelineRequest request) {
-        return Observable.create(subscriber -> {
+        return wrapCall(Observable.create(subscriber -> {
             getHomeTimeline(
                     request.getCount(),
                     request.getSinceId(),
                     request.getMaxId(),
                     getTimelineHandler(subscriber)
             );
-        });
+        }));
     }
     // endregion
 
@@ -90,14 +98,14 @@ public class TwitterClient extends OAuthBaseClient {
 	}
 
     public Observable<Tweet> getMentionsTimeline(TimelineRequest request) {
-        return Observable.create(subscriber -> {
+        return wrapCall(Observable.create(subscriber -> {
             getMentionsTimeline(
                     request.getCount(),
                     request.getSinceId(),
                     request.getMaxId(),
                     getTimelineHandler(subscriber)
             );
-        });
+        }));
     }
     // endregion
 
@@ -119,7 +127,7 @@ public class TwitterClient extends OAuthBaseClient {
 	}
 
     public Observable<Tweet> getUserTimeline(String screenName, TimelineRequest request) {
-        return Observable.create(subscriber -> {
+        return wrapCall(Observable.create(subscriber -> {
             getUserTimeline(
                     screenName,
                     request.getCount(),
@@ -127,7 +135,7 @@ public class TwitterClient extends OAuthBaseClient {
                     request.getMaxId(),
                     getTimelineHandler(subscriber)
             );
-        });
+        }));
     }
     // endregion
 
@@ -210,7 +218,7 @@ public class TwitterClient extends OAuthBaseClient {
     }
 
     public Observable<Tweet> getSearchTimeline(String query, TimelineRequest request) {
-        return Observable.create(subscriber -> {
+        return wrapCall(Observable.create(subscriber -> {
             getSearchTimeline(
                     query,
                     request.getCount(),
@@ -244,7 +252,7 @@ public class TwitterClient extends OAuthBaseClient {
                         }
                     }
             );
-        });
+        }));
     }
 
     // endregion
@@ -351,6 +359,11 @@ public class TwitterClient extends OAuthBaseClient {
                 }
             }
         };
+    }
+
+    private Observable<Tweet> wrapCall(Observable<Tweet> original) {
+        requestSubject.onNext(NetworkState.LOADING);
+        return original.doOnCompleted(() -> requestSubject.onNext(NetworkState.STALE));
     }
     // endregion
 

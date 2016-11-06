@@ -18,5 +18,6 @@
     <string name="tab_timeline">Timeline</string>
     <string name="tab_mentions">Mentions</string>
     <string name="tab_me">Me</string>
+    <string name="progress_loading">Loading...</string>
 
 </resources>

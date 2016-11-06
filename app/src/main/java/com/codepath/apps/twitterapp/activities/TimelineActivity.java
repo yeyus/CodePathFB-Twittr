@@ -21,6 +21,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.Window;
+import android.widget.ProgressBar;
 
 import com.codepath.apps.twitterapp.R;
 import com.codepath.apps.twitterapp.TwitterApplication;
@@ -31,6 +32,7 @@ import com.codepath.apps.twitterapp.fragments.MentionsTimelineFragment;
 import com.codepath.apps.twitterapp.fragments.ProfileFragment;
 import com.codepath.apps.twitterapp.models.Tweet;
 import com.codepath.apps.twitterapp.models.User;
+import com.codepath.apps.twitterapp.utils.NetworkState;
 
 import org.parceler.Parcels;
 
@@ -62,6 +64,7 @@ public class TimelineActivity extends AppCompatActivity {
     @BindView(R.id.appBar) AppBarLayout appBar;
     @BindView(vpPager) ViewPager vpPages;
     @BindView(R.id.tlTabs) TabLayout tlTabs;
+    private MenuItem miActionProgressItem;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -78,6 +81,18 @@ public class TimelineActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
 
         client = TwitterApplication.getRestClient();
+
+        // Network status handler
+        client.getRequestSubject().repeat().subscribe(
+                networkState -> {
+                    if (miActionProgressItem != null) {
+                        if (networkState == NetworkState.LOADING) {
+                            miActionProgressItem.setVisible(true);
+                        } else {
+                            miActionProgressItem.setVisible(false);
+                        }
+                    }
+                });
 
         client.getAccount().subscribe(user -> {
             profileFragment = ProfileFragment.newInstance(user);
@@ -213,6 +228,8 @@ public class TimelineActivity extends AppCompatActivity {
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.timeline, menu);
         MenuItem searchItem = menu.findItem(R.id.action_search);
+        miActionProgressItem = menu.findItem(R.id.miActionProgress);
+        ProgressBar v =  (ProgressBar) MenuItemCompat.getActionView(miActionProgressItem);
         final SearchView searchView = (SearchView) MenuItemCompat.getActionView(searchItem);
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
