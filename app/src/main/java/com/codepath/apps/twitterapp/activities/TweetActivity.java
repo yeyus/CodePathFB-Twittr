@@ -1,10 +1,12 @@
 package com.codepath.apps.twitterapp.activities;
 
 import android.os.Bundle;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
 import android.view.MenuItem;
+import android.view.View;
 
 import com.codepath.apps.twitterapp.R;
 import com.codepath.apps.twitterapp.TwitterApplication;
@@ -22,11 +24,13 @@ public class TweetActivity extends AppCompatActivity {
     private TweetFragment fragmentTweet;
 
     private Tweet tweet;
+    private View rootView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_tweet);
+        rootView = getLayoutInflater().inflate(R.layout.activity_tweet, null);
+        setContentView(rootView);
 
         client = TwitterApplication.getRestClient();
         tweet = Parcels.unwrap(getIntent().getParcelableExtra("tweet"));
@@ -47,14 +51,24 @@ public class TweetActivity extends AppCompatActivity {
                         ComposeTweetDialogFragment.newInstance(tweet)));
 
         fragmentTweet.getFavoriteClickSubject()
-                .map(tweet ->
+                .flatMap(tweet ->
                     tweet.getFavorited() ? client.postFavorite(tweet) : client.destroyFavorite(tweet)
-                ).subscribe(tweet -> {});
+                ).retry().repeat().subscribe(
+                    tweet -> {},
+                    throwable ->
+                        Snackbar.make(rootView, R.string.tweet_posting_error, Snackbar.LENGTH_LONG)
+                                .show()
+                );
 
         fragmentTweet.getRetweetClickSubject()
-                .map(tweet ->
+                .flatMap(tweet ->
                     tweet.getRetweeted() ? client.postRetweet(tweet) : client.destroyRetweet(tweet)
-                ).subscribe(tweet -> {});
+                ).retry().repeat().subscribe(
+                    tweet -> {},
+                    throwable ->
+                        Snackbar.make(rootView, R.string.tweet_posting_error, Snackbar.LENGTH_LONG)
+                                .show()
+                );
     }
 
     private void openComposeDialog(ComposeTweetDialogFragment fragment) {
