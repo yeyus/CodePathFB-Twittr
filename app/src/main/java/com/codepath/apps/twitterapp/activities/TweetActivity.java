@@ -8,7 +8,7 @@ import android.view.MenuItem;
 
 import com.codepath.apps.twitterapp.R;
 import com.codepath.apps.twitterapp.TwitterApplication;
-import com.codepath.apps.twitterapp.TwitterClient;
+import com.codepath.apps.twitterapp.api.TwitterClient;
 import com.codepath.apps.twitterapp.fragments.ComposeTweetDialogFragment;
 import com.codepath.apps.twitterapp.fragments.TweetFragment;
 import com.codepath.apps.twitterapp.models.Tweet;
@@ -45,6 +45,16 @@ public class TweetActivity extends AppCompatActivity {
         fragmentTweet.getReplyClickSubject()
                 .subscribe(tweet -> openComposeDialog(
                         ComposeTweetDialogFragment.newInstance(tweet)));
+
+        fragmentTweet.getFavoriteClickSubject()
+                .map(tweet ->
+                    tweet.getFavorited() ? client.postFavorite(tweet) : client.destroyFavorite(tweet)
+                ).subscribe(tweet -> {});
+
+        fragmentTweet.getRetweetClickSubject()
+                .map(tweet ->
+                    tweet.getRetweeted() ? client.postRetweet(tweet) : client.destroyRetweet(tweet)
+                ).subscribe(tweet -> {});
     }
 
     private void openComposeDialog(ComposeTweetDialogFragment fragment) {

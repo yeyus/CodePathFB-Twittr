@@ -124,14 +124,15 @@
                 android:layout_alignParentStart="true"
                 android:layout_alignParentLeft="true"/>
 
+            <!--android:tint="@color/twitter_grey"-->
             <ImageButton
                 android:layout_width="25dp"
                 android:layout_height="25dp"
                 android:src="@drawable/ic_retweet_24dp"
+                android:tint="@color/twitter_grey"
                 tools:text="@string/tweet_reply_action"
                 android:id="@+id/btnRetweet"
                 android:background="@android:color/transparent"
-                android:tint="@color/twitter_grey"
                 android:scaleType="fitXY"
                 android:layout_centerHorizontal="true"
                 android:layout_toLeftOf="@+id/tvRetweetsCount"
@@ -151,7 +152,7 @@
                 android:layout_height="25dp"
                 android:src="@drawable/ic_like_24dp"
                 tools:text="@string/tweet_reply_action"
-                android:id="@+id/imageButton"
+                android:id="@+id/btnFavorite"
                 android:background="@android:color/transparent"
                 android:tint="@color/twitter_grey"
                 android:scaleType="fitXY"

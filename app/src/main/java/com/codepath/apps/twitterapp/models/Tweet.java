@@ -45,7 +45,13 @@ public class Tweet extends BaseModel {
     String createdAt;
 
     @Column
+    Boolean retweeted;
+
+    @Column
     Integer retweetCount = 0;
+
+    @Column
+    Boolean favorited;
 
     @Column
     Integer favouritesCount = 0;
@@ -77,12 +83,30 @@ public class Tweet extends BaseModel {
         return user;
     }
 
+    public Boolean getRetweeted() {
+        return retweeted;
+    }
+
     public int getRetweetCount() {
         return retweetCount;
     }
 
+    public Boolean getFavorited() {
+        return favorited;
+    }
+
     public int getFavouritesCount() {
         return favouritesCount;
+    }
+
+    public void setRetweeted(Boolean retweeted) {
+        this.retweeted = retweeted;
+        this.retweetCount = retweeted ? this.retweetCount + 1 : this.retweetCount - 1;
+    }
+
+    public void setFavorited(Boolean favorited) {
+        this.favorited = favorited;
+        this.favouritesCount = favorited ? this.favouritesCount + 1 : this.favouritesCount - 1;
     }
 
     public String getRelativeCreatedAt() {
@@ -163,9 +187,11 @@ public class Tweet extends BaseModel {
             tw.body = jsonObject.getString("text");
             tw.createdAt = jsonObject.getString("created_at");
             tw.user = User.fromJSON(jsonObject.getJSONObject("user"));
+            tw.retweeted = jsonObject.getBoolean("retweeted");
             if(!jsonObject.isNull("retweet_count")) {
                 tw.retweetCount = jsonObject.getInt("retweet_count");
             }
+            tw.favorited = jsonObject.getBoolean("favorited");
             if(!jsonObject.isNull("favourites_count")) {
                 tw.favouritesCount = jsonObject.getInt("favourites_count");
             }

@@ -7,6 +7,8 @@ import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.AnimationUtils;
+import android.widget.ImageButton;
 
 import com.codepath.apps.twitterapp.R;
 import com.codepath.apps.twitterapp.databinding.ItemTweetBinding;
@@ -25,11 +27,21 @@ public class TweetFragment extends Fragment {
 
     public static final String TAG = TweetFragment.class.getSimpleName();
     private final PublishSubject<Tweet> replyClickSubject = PublishSubject.create();
+    private final PublishSubject<Tweet> favoriteClickSubject = PublishSubject.create();
+    private final PublishSubject<Tweet> retweetClickSubject = PublishSubject.create();
 
     public TweetFragment() {}
 
     public PublishSubject<Tweet> getReplyClickSubject() {
         return replyClickSubject;
+    }
+
+    public PublishSubject<Tweet> getFavoriteClickSubject() {
+        return favoriteClickSubject;
+    }
+
+    public PublishSubject<Tweet> getRetweetClickSubject() {
+        return retweetClickSubject;
     }
 
     public static TweetFragment newInstance(Tweet tweet, boolean showMedia, boolean showActions) {
@@ -63,6 +75,24 @@ public class TweetFragment extends Fragment {
 
         binding.btnReply.setOnClickListener(v -> {
             replyClickSubject.onNext(tweet);
+        });
+        binding.btnRetweet.setOnClickListener(v -> {
+            v.setSelected(!v.isSelected());
+            tweet.setRetweeted(v.isSelected());
+            binding.tvRetweetsCount.setText(String.valueOf(tweet.getRetweetCount()));
+            v.startAnimation(AnimationUtils.loadAnimation(getContext(), R.anim.image_click));
+            ((ImageButton)v).setColorFilter(getResources().getColor(
+                    v.isSelected() ? R.color.twitter_active_retweet : R.color.twitter_grey));
+            retweetClickSubject.onNext(tweet);
+        });
+        binding.btnFavorite.setOnClickListener(v -> {
+            v.setSelected(!v.isSelected());
+            tweet.setFavorited(v.isSelected());
+            binding.tvFavCount.setText(String.valueOf(tweet.getFavouritesCount()));
+            v.startAnimation(AnimationUtils.loadAnimation(getContext(), R.anim.image_click));
+            ((ImageButton)v).setColorFilter(getResources().getColor(
+                    v.isSelected() ? R.color.twitter_active_fav : R.color.twitter_grey));
+            favoriteClickSubject.onNext(tweet);
         });
 
         if (!showMedia) {

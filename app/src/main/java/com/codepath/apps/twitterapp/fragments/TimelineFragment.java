@@ -14,7 +14,7 @@ import android.view.ViewGroup;
 
 import com.codepath.apps.twitterapp.R;
 import com.codepath.apps.twitterapp.TwitterApplication;
-import com.codepath.apps.twitterapp.TwitterClient;
+import com.codepath.apps.twitterapp.api.TwitterClient;
 import com.codepath.apps.twitterapp.adapters.TweetsAdapter;
 import com.codepath.apps.twitterapp.models.TimelineRequest;
 import com.codepath.apps.twitterapp.models.Tweet;
@@ -40,6 +40,8 @@ public abstract class TimelineFragment extends Fragment {
     private final PublishSubject<Tweet> replyClickSubject = PublishSubject.create();
     private final PublishSubject<Tweet> tweetClickSubject = PublishSubject.create();
     private final PublishSubject<User> profileClickSubject = PublishSubject.create();
+    private final PublishSubject<Tweet> favoriteClickSubject = PublishSubject.create();
+    private final PublishSubject<Tweet> retweetClickSubject = PublishSubject.create();
 
     protected TwitterClient client;
 
@@ -109,6 +111,8 @@ public abstract class TimelineFragment extends Fragment {
         tweetsAdapter.getReplyClickSubject().subscribe(tweet -> replyClickSubject.onNext(tweet));
         tweetsAdapter.getTweetClickSubject().subscribe(tweet -> tweetClickSubject.onNext(tweet));
         tweetsAdapter.getProfileClickSubject().subscribe(user -> profileClickSubject.onNext(user));
+        tweetsAdapter.getFavoriteClickSubject().subscribe(tweet -> favoriteClickSubject.onNext(tweet));
+        tweetsAdapter.getRetweetClickSubject().subscribe(tweet -> retweetClickSubject.onNext(tweet));
 
         // Pull to refresh
         swipeContainer.setOnRefreshListener(() -> {
@@ -159,6 +163,14 @@ public abstract class TimelineFragment extends Fragment {
 
     public Observable<User> getProfileClickObservable() {
         return profileClickSubject;
+    }
+
+    public PublishSubject<Tweet> getFavoriteClickSubject() {
+        return favoriteClickSubject;
+    }
+
+    public PublishSubject<Tweet> getRetweetClickSubject() {
+        return retweetClickSubject;
     }
 
     public void addTweet(Tweet t) {

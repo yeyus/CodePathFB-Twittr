@@ -99,7 +99,9 @@ public class User extends BaseModel {
             u.followers = jsonObject.getInt("followers_count");
             u.following = jsonObject.getInt("friends_count");
             u.description = jsonObject.getString("description");
-            u.profileBannerUrl = jsonObject.getString("profile_banner_url");
+            if (!jsonObject.isNull("profile_banner_url")) {
+                u.profileBannerUrl = jsonObject.getString("profile_banner_url");
+            }
         } catch (JSONException e) {
             e.printStackTrace();
         }

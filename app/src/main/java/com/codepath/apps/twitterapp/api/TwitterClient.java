@@ -1,4 +1,4 @@
-package com.codepath.apps.twitterapp;
+package com.codepath.apps.twitterapp.api;
 
 import android.content.Context;
 import android.util.Log;
@@ -21,6 +21,7 @@ import java.util.ArrayList;
 
 import cz.msebera.android.httpclient.Header;
 import rx.Observable;
+import rx.Subscriber;
 
 /*
  * 
@@ -39,7 +40,7 @@ public class TwitterClient extends OAuthBaseClient {
 	public static final String TAG = TwitterClient.class.getSimpleName();
 
 	public static final Class<? extends Api> REST_API_CLASS = TwitterApi.class; // Change this
-	public static final String REST_URL = "https://api.twitter.com/1.1/"; // Change this, base API URL
+	public static final String REST_URL = "https://api.twitter.com/1.1"; // Change this, base API URL
 	public static final String REST_CONSUMER_KEY = "R37ou6CF9ybUZijkCvxj2oxdl";       // Change this
 	public static final String REST_CONSUMER_SECRET = "UDKmTrxGXyKE2x2B3qfSserRr0UZNnZ8bd7mkHTfK3zW5rrVCy"; // Change this
 	public static final String REST_CALLBACK_URL = "oauth://tweetsappcallback"; // Change this (here and in manifest)
@@ -48,6 +49,7 @@ public class TwitterClient extends OAuthBaseClient {
 		super(context, REST_API_CLASS, REST_URL, REST_CONSUMER_KEY, REST_CONSUMER_SECRET, REST_CALLBACK_URL);
 	}
 
+    // region Home Timeline
 	public void getHomeTimeline(int count, long since_id, long max_id, AsyncHttpResponseHandler handler) {
 		String apiUrl = getApiUrl("statuses/home_timeline.json");
 		RequestParams params = new RequestParams();
@@ -67,31 +69,13 @@ public class TwitterClient extends OAuthBaseClient {
                     request.getCount(),
                     request.getSinceId(),
                     request.getMaxId(),
-                    new JsonHttpResponseHandler() {
-                        @Override
-                        public void onSuccess(int statusCode, Header[] headers, JSONArray response) {
-                            if (!subscriber.isUnsubscribed()) {
-                                ArrayList<Tweet> tweets = Tweet.fromJSONArray(response);
-								Log.i(TAG, String.format("Received %d tweets", tweets.size()));
-                                for (Tweet t: tweets) {
-                                    subscriber.onNext(t);
-                                }
-                                Log.i(TAG, String.format("Closing connection and observable"));
-                                subscriber.onCompleted();
-                            }
-                        }
-
-                        @Override
-                        public void onFailure(int statusCode, Header[] headers, Throwable throwable, JSONObject errorResponse) {
-                            if (!subscriber.isUnsubscribed()) {
-                                subscriber.onError(throwable);
-                            }
-                        }
-                    }
+                    getTimelineHandler(subscriber)
             );
         });
     }
+    // endregion
 
+    // region Mentions Timeline
 	public void getMentionsTimeline(int count, long since_id, long max_id, AsyncHttpResponseHandler handler) {
 		String apiUrl = getApiUrl("statuses/mentions_timeline.json");
 		RequestParams params = new RequestParams();
@@ -111,31 +95,13 @@ public class TwitterClient extends OAuthBaseClient {
                     request.getCount(),
                     request.getSinceId(),
                     request.getMaxId(),
-                    new JsonHttpResponseHandler() {
-                        @Override
-                        public void onSuccess(int statusCode, Header[] headers, JSONArray response) {
-                            if (!subscriber.isUnsubscribed()) {
-                                ArrayList<Tweet> tweets = Tweet.fromJSONArray(response);
-                                Log.i(TAG, String.format("Received %d tweets", tweets.size()));
-                                for (Tweet t: tweets) {
-                                    subscriber.onNext(t);
-                                }
-                                Log.i(TAG, String.format("Closing connection and observable"));
-                                subscriber.onCompleted();
-                            }
-                        }
-
-                        @Override
-                        public void onFailure(int statusCode, Header[] headers, Throwable throwable, JSONObject errorResponse) {
-                            if (!subscriber.isUnsubscribed()) {
-                                subscriber.onError(throwable);
-                            }
-                        }
-                    }
+                    getTimelineHandler(subscriber)
             );
         });
     }
+    // endregion
 
+    // region User Timeline
 	public void getUserTimeline(String screenName, int count, long since_id, long max_id, AsyncHttpResponseHandler handler) {
 		String apiUrl = getApiUrl("statuses/user_timeline.json");
 		RequestParams params = new RequestParams();
@@ -159,31 +125,13 @@ public class TwitterClient extends OAuthBaseClient {
                     request.getCount(),
                     request.getSinceId(),
                     request.getMaxId(),
-                    new JsonHttpResponseHandler() {
-                        @Override
-                        public void onSuccess(int statusCode, Header[] headers, JSONArray response) {
-                            if (!subscriber.isUnsubscribed()) {
-                                ArrayList<Tweet> tweets = Tweet.fromJSONArray(response);
-                                Log.i(TAG, String.format("Received %d tweets", tweets.size()));
-                                for (Tweet t: tweets) {
-                                    subscriber.onNext(t);
-                                }
-                                Log.i(TAG, String.format("Closing connection and observable"));
-                                subscriber.onCompleted();
-                            }
-                        }
-
-                        @Override
-                        public void onFailure(int statusCode, Header[] headers, Throwable throwable, JSONObject errorResponse) {
-                            if (!subscriber.isUnsubscribed()) {
-                                subscriber.onError(throwable);
-                            }
-                        }
-                    }
+                    getTimelineHandler(subscriber)
             );
         });
     }
+    // endregion
 
+    // region Post Tweet
 	public void postTweet(String body, AsyncHttpResponseHandler handler) {
 		String apiUrl = getApiUrl("statuses/update.json");
 		RequestParams params = new RequestParams();
@@ -212,7 +160,9 @@ public class TwitterClient extends OAuthBaseClient {
             });
         });
     }
+    // endregion
 
+    // region Get Account
 	public void getAccount(AsyncHttpResponseHandler handler) {
 		String apiUrl = getApiUrl("account/verify_credentials.json");
 		getClient().get(apiUrl, null, handler);
@@ -239,6 +189,9 @@ public class TwitterClient extends OAuthBaseClient {
             });
         });
     }
+    // endregion
+
+    // region Search Timeline
 
     public void getSearchTimeline(String query, int count, long since_id, long max_id, AsyncHttpResponseHandler handler) {
         String apiUrl = getApiUrl("search/tweets.json");
@@ -293,5 +246,112 @@ public class TwitterClient extends OAuthBaseClient {
             );
         });
     }
+
+    // endregion
+
+    // region Favorite
+    public void postFavorite(Tweet tweet, AsyncHttpResponseHandler handler) {
+        String apiUrl = getApiUrl("favorites/create.json");
+        RequestParams params = new RequestParams();
+        params.put("id", tweet.getUid());
+        getClient().post(apiUrl, params, handler);
+    }
+
+    public Observable<Tweet> postFavorite(Tweet tweet) {
+        return Observable.create(subscriber -> {
+           postFavorite(tweet, getTweetHandler(subscriber));
+        });
+    }
+
+    public void destroyFavorite(Tweet tweet, AsyncHttpResponseHandler handler) {
+        String apiUrl = getApiUrl("favorites/destroy.json");
+        RequestParams params = new RequestParams();
+        params.put("id", tweet.getUid());
+        getClient().post(apiUrl, params, handler);
+    }
+
+    public Observable<Tweet> destroyFavorite(Tweet tweet) {
+        return Observable.create(subscriber -> {
+            destroyFavorite(tweet, getTweetHandler(subscriber));
+        });
+    }
+    // endregion
+
+    // region ReTweet
+    public void postRetweet(Tweet tweet, AsyncHttpResponseHandler handler) {
+        String apiUrl = getApiUrl(String.format("statuses/retweet/%d.json", tweet.getUid()));
+        getClient().post(apiUrl, null, handler);
+    }
+
+    public Observable<Tweet> postRetweet(Tweet tweet) {
+        return Observable.create(subscriber -> {
+            postRetweet(tweet, getTweetHandler(subscriber));
+        });
+    }
+
+    public void destroyRetweet(Tweet tweet, AsyncHttpResponseHandler handler) {
+        String apiUrl = getApiUrl(String.format("statuses/unretweet/%d.json", tweet.getUid()));
+        getClient().post(apiUrl, null, handler);
+    }
+
+    public Observable<Tweet> destroyRetweet(Tweet tweet) {
+        return Observable.create(subscriber -> {
+            destroyRetweet(tweet, getTweetHandler(subscriber));
+        });
+    }
+    // endregion
+
+    // region JSON Handlers
+    private JsonHttpResponseHandler getTimelineHandler(Subscriber<? super Tweet> subscriber) {
+        return new JsonHttpResponseHandler() {
+            @Override
+            public void onSuccess(int statusCode, Header[] headers, JSONArray response) {
+                if (!subscriber.isUnsubscribed()) {
+                    ArrayList<Tweet> tweets = Tweet.fromJSONArray(response);
+                    Log.i(TAG, String.format("Received %d tweets", tweets.size()));
+                    for (Tweet t: tweets) {
+                        subscriber.onNext(t);
+                    }
+                    Log.i(TAG, String.format("Closing connection and observable"));
+                    subscriber.onCompleted();
+                }
+            }
+
+            @Override
+            public void onFailure(int statusCode, Header[] headers, Throwable throwable, JSONObject errorResponse) {
+                if (!subscriber.isUnsubscribed()) {
+                    subscriber.onError(throwable);
+                }
+            }
+        };
+    }
+
+    private JsonHttpResponseHandler getTweetHandler(Subscriber<? super Tweet> subscriber) {
+        return new JsonHttpResponseHandler() {
+            @Override
+            public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
+                if (!subscriber.isUnsubscribed()) {
+                    subscriber.onNext(Tweet.fromJSON(response));
+                    Log.i(TAG, String.format("Closing connection and observable"));
+                    subscriber.onCompleted();
+                }
+            }
+
+            @Override
+            public void onFailure(int statusCode, Header[] headers, Throwable throwable, JSONObject errorResponse) {
+                if (!subscriber.isUnsubscribed()) {
+                    subscriber.onError(throwable);
+                }
+            }
+
+            @Override
+            public void onFailure(int statusCode, Header[] headers, String error, Throwable throwable) {
+                if (!subscriber.isUnsubscribed()) {
+                    subscriber.onError(throwable);
+                }
+            }
+        };
+    }
+    // endregion
 
 }

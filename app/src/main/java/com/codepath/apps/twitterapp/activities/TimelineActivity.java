@@ -24,7 +24,7 @@ import android.view.Window;
 
 import com.codepath.apps.twitterapp.R;
 import com.codepath.apps.twitterapp.TwitterApplication;
-import com.codepath.apps.twitterapp.TwitterClient;
+import com.codepath.apps.twitterapp.api.TwitterClient;
 import com.codepath.apps.twitterapp.fragments.ComposeTweetDialogFragment;
 import com.codepath.apps.twitterapp.fragments.HomeTimelineFragment;
 import com.codepath.apps.twitterapp.fragments.MentionsTimelineFragment;
@@ -131,6 +131,29 @@ public class TimelineActivity extends AppCompatActivity {
                     i.putExtra("tweet", Parcels.wrap(tweet));
                     startActivity(i);
                 }
+            );
+
+        Observable.merge(
+                homeTimelineFragment.getRetweetClickSubject(),
+                mentionsTimelineFragment.getRetweetClickSubject()
+            ).flatMap(tweet ->
+                tweet.getRetweeted() ? client.postRetweet(tweet) : client.destroyRetweet(tweet)
+            ).retry().repeat().subscribe(
+                tweet -> addTweet(tweet),
+                throwable ->
+                    Snackbar.make(rootView, R.string.tweet_posting_error, Snackbar.LENGTH_LONG)
+                            .show()
+            );
+
+        Observable.merge(
+                homeTimelineFragment.getFavoriteClickSubject(),
+                mentionsTimelineFragment.getFavoriteClickSubject()
+            ).flatMap(tweet ->
+                    tweet.getFavorited() ? client.postFavorite(tweet) : client.destroyFavorite(tweet)
+            ).retry().repeat().subscribe(
+                tweet -> {},
+                throwable -> Snackbar.make(rootView, R.string.tweet_posting_error, Snackbar.LENGTH_LONG)
+                        .show()
             );
 
         Observable.merge(
