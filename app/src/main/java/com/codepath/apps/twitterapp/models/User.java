@@ -10,9 +10,12 @@ import com.raizlabs.android.dbflow.annotation.PrimaryKey;
 import com.raizlabs.android.dbflow.annotation.Table;
 import com.raizlabs.android.dbflow.structure.BaseModel;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.parceler.Parcel;
+
+import java.util.ArrayList;
 
 import jp.wasabeef.glide.transformations.RoundedCornersTransformation;
 
@@ -107,5 +110,20 @@ public class User extends BaseModel {
         }
 
         return u;
+    }
+
+    public static ArrayList<User> fromJSONArray(JSONArray jsonArray) {
+        ArrayList<User> users = new ArrayList<User>();
+
+        for(int i = 0; i < jsonArray.length(); i++) {
+            try {
+                users.add(User.fromJSON(jsonArray.getJSONObject(i)));
+            } catch (JSONException e) {
+                e.printStackTrace();
+                continue;
+            }
+        }
+
+        return users;
     }
 }

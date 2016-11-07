@@ -57,12 +57,13 @@
             android:name=".activities.ImageActivity"
             android:theme="@style/Theme.AppCompat.NoActionBar" />
         <activity
-            android:theme="@style/Theme.AppCompat.Light.NoActionBar"
-            android:name=".activities.ProfileActivity" />
+            android:name=".activities.ProfileActivity"
+            android:theme="@style/Theme.AppCompat.Light.NoActionBar" />
         <activity android:name=".activities.SearchActivity" />
         <activity
-            android:label="@string/direct_messages"
-            android:name=".activities.DMActivity"></activity>
+            android:name=".activities.DMActivity"
+            android:label="@string/direct_messages" />
+        <activity android:name=".activities.FollowActivity"></activity>
     </application>
 
 </manifest>

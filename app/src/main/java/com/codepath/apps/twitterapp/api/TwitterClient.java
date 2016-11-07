@@ -339,6 +339,34 @@ public class TwitterClient extends OAuthBaseClient {
     }
     // endregion
 
+    // region Followers
+    public void getFollowers(User user, long cursor, int count, AsyncHttpResponseHandler handler) {
+        String apiUrl = getApiUrl("followers/list.json");
+        RequestParams params = new RequestParams();
+        params.put("count", String.valueOf(count));
+        params.put("cursor", String.valueOf(cursor));
+        params.put("user_id", String.valueOf(user.getUid()));
+        getClient().get(apiUrl, params, handler);
+    }
+
+    public Observable<User> getFollowers(User user, long cursor, int count) {
+        return Observable.create(subscriber -> getFollowers(user, cursor, count, getUsersHandler(subscriber)));
+    }
+
+    public void getFollowing(User user, long cursor, int count, AsyncHttpResponseHandler handler) {
+        String apiUrl = getApiUrl("friends/list.json");
+        RequestParams params = new RequestParams();
+        params.put("count", String.valueOf(count));
+        params.put("cursor", String.valueOf(cursor));
+        params.put("user_id", String.valueOf(user.getUid()));
+        getClient().get(apiUrl, params, handler);
+    }
+
+    public Observable<User> getFollowing(User user, long cursor, int count) {
+        return Observable.create(subscriber -> getFollowing(user, cursor, count, getUsersHandler(subscriber)));
+    }
+    // endregion
+
     // region JSON Handlers
     private JsonHttpResponseHandler getTimelineHandler(Subscriber<? super Tweet> subscriber) {
         return new JsonHttpResponseHandler() {
@@ -403,6 +431,35 @@ public class TwitterClient extends OAuthBaseClient {
                     }
                     Log.i(TAG, String.format("Closing connection and observable"));
                     subscriber.onCompleted();
+                }
+            }
+
+            @Override
+            public void onFailure(int statusCode, Header[] headers, Throwable throwable, JSONObject errorResponse) {
+                if (!subscriber.isUnsubscribed()) {
+                    subscriber.onError(throwable);
+                }
+            }
+        };
+    }
+
+    private JsonHttpResponseHandler getUsersHandler(Subscriber<? super User> subscriber) {
+        return new JsonHttpResponseHandler() {
+            @Override
+            public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
+                if (!subscriber.isUnsubscribed()) {
+                    List<User> users = null;
+                    try {
+                        users = User.fromJSONArray(response.getJSONArray("users"));
+                        Log.i(TAG, String.format("Received %d users", users.size()));
+                        for (User u: users) {
+                            subscriber.onNext(u);
+                        }
+                        Log.i(TAG, String.format("Closing connection and observable"));
+                        subscriber.onCompleted();
+                    } catch (JSONException e) {
+                        subscriber.onError(e);
+                    }
                 }
             }
 

@@ -22,5 +22,7 @@
     <string name="dm_posting_error">Direct message posting error</string>
     <string name="messages">Messages</string>
     <string name="direct_messages">Direct Messages</string>
+    <string name="following">Following</string>
+    <string name="followers">Followers</string>
 
 </resources>

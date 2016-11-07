@@ -76,6 +76,7 @@
                 android:layout_marginLeft="16dp"/>
 
             <LinearLayout
+                android:id="@+id/llFollows"
                 android:orientation="horizontal"
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"

@@ -15,6 +15,7 @@ import android.view.ViewGroup;
 
 import com.codepath.apps.twitterapp.R;
 import com.codepath.apps.twitterapp.TwitterApplication;
+import com.codepath.apps.twitterapp.activities.FollowActivity;
 import com.codepath.apps.twitterapp.activities.TweetActivity;
 import com.codepath.apps.twitterapp.databinding.FragmentProfileBinding;
 import com.codepath.apps.twitterapp.models.User;
@@ -63,6 +64,12 @@ public class ProfileFragment extends Fragment {
     }
 
     private void setupListeners() {
+        binding.llFollows.setOnClickListener(v -> {
+            Intent i = new Intent(getContext(), FollowActivity.class);
+            i.putExtra("user", Parcels.wrap(user));
+            startActivity(i);
+        });
+
         timelineFragment.getOnTweetClickObservable()
                 .subscribe(tweet -> {
                     Intent i = new Intent(getContext(), TweetActivity.class);
