@@ -44,6 +44,7 @@ import butterknife.ButterKnife;
 import butterknife.OnClick;
 import rx.Observable;
 
+import static com.codepath.apps.twitterapp.R.id.action_dm;
 import static com.codepath.apps.twitterapp.R.id.vpPager;
 
 public class TimelineActivity extends AppCompatActivity {
@@ -246,6 +247,23 @@ public class TimelineActivity extends AppCompatActivity {
             }
         });
         return super.onCreateOptionsMenu(menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case action_dm:
+                Intent i = new Intent(TimelineActivity.this, DMActivity.class);
+                startActivity(i);
+                return true;
+        }
+        return false;
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        miActionProgressItem.setVisible(false);
     }
 
     public static class TimelineAdapter extends FragmentPagerAdapter {

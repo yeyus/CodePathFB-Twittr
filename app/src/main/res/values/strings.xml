@@ -19,5 +19,8 @@
     <string name="tab_mentions">Mentions</string>
     <string name="tab_me">Me</string>
     <string name="progress_loading">Loading...</string>
+    <string name="dm_posting_error">Direct message posting error</string>
+    <string name="messages">Messages</string>
+    <string name="direct_messages">Direct Messages</string>
 
 </resources>

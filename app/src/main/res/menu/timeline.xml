@@ -6,6 +6,11 @@
         android:icon="@android:drawable/ic_menu_search"
         app:showAsAction="ifRoom|collapseActionView"
         app:actionViewClass="android.support.v7.widget.SearchView" />
+    <item android:id="@+id/action_dm"
+        android:orderInCategory="10"
+        android:title="@string/messages"
+        android:icon="@drawable/ic_email_24dp"
+        app:showAsAction="always" />
     <item
         android:id="@+id/miActionProgress"
         android:title="@string/progress_loading"

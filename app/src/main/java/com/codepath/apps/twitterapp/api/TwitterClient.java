@@ -3,6 +3,7 @@ package com.codepath.apps.twitterapp.api;
 import android.content.Context;
 import android.util.Log;
 
+import com.codepath.apps.twitterapp.models.DirectMessage;
 import com.codepath.apps.twitterapp.models.TimelineRequest;
 import com.codepath.apps.twitterapp.models.Tweet;
 import com.codepath.apps.twitterapp.models.User;
@@ -19,6 +20,7 @@ import org.scribe.builder.api.Api;
 import org.scribe.builder.api.TwitterApi;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import cz.msebera.android.httpclient.Header;
 import rx.Observable;
@@ -309,6 +311,34 @@ public class TwitterClient extends OAuthBaseClient {
     }
     // endregion
 
+    // region Direct Messages
+    public void getDirectMessages(int count, long since_id, long max_id, AsyncHttpResponseHandler handler) {
+        String apiUrl = getApiUrl("direct_messages.json");
+        RequestParams params = new RequestParams();
+        params.put("count", String.valueOf(count));
+        if (since_id > 0) {
+            params.put("since_id", String.valueOf(since_id));
+        }
+        if(max_id > 0) {
+            params.put("max_id", String.valueOf(max_id));
+        }
+        getClient().get(apiUrl, params, handler);
+    }
+
+    public Observable<DirectMessage> getDirectMessages(TimelineRequest request) {
+        requestSubject.onNext(NetworkState.LOADING);
+        Observable<DirectMessage> obs = Observable.create(subscriber -> {
+            getDirectMessages(
+                    request.getCount(),
+                    request.getSinceId(),
+                    request.getMaxId(),
+                    getDirectMessagesHandler(subscriber));
+        });
+        obs.doOnCompleted(() -> requestSubject.onNext(NetworkState.STALE));
+        return obs;
+    }
+    // endregion
+
     // region JSON Handlers
     private JsonHttpResponseHandler getTimelineHandler(Subscriber<? super Tweet> subscriber) {
         return new JsonHttpResponseHandler() {
@@ -354,6 +384,30 @@ public class TwitterClient extends OAuthBaseClient {
 
             @Override
             public void onFailure(int statusCode, Header[] headers, String error, Throwable throwable) {
+                if (!subscriber.isUnsubscribed()) {
+                    subscriber.onError(throwable);
+                }
+            }
+        };
+    }
+
+    private JsonHttpResponseHandler getDirectMessagesHandler(Subscriber<? super DirectMessage> subscriber) {
+        return new JsonHttpResponseHandler() {
+            @Override
+            public void onSuccess(int statusCode, Header[] headers, JSONArray response) {
+                if (!subscriber.isUnsubscribed()) {
+                    List<DirectMessage> dms = DirectMessage.fromJSONArray(response);
+                    Log.i(TAG, String.format("Received %d direct messages", dms.size()));
+                    for (DirectMessage t: dms) {
+                        subscriber.onNext(t);
+                    }
+                    Log.i(TAG, String.format("Closing connection and observable"));
+                    subscriber.onCompleted();
+                }
+            }
+
+            @Override
+            public void onFailure(int statusCode, Header[] headers, Throwable throwable, JSONObject errorResponse) {
                 if (!subscriber.isUnsubscribed()) {
                     subscriber.onError(throwable);
                 }
